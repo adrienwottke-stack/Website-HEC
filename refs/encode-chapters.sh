@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Cut the single-shot HEC film into the four chapter segments the scrub engine
-# expects (one clip per scene), encode desktop + mobile variants, and extract
-# the exact first-frame posters from the ENCODED clips.
+# expects (one clip per scene), encode desktop (1080p cap) + mobile (720p cap)
+# variants, and extract the exact first-frame posters from the ENCODED clips.
 #
 # Usage: bash refs/encode-chapters.sh refs/film/source.mp4
 # Output: app/public/assets/world/<chapter>{,-mobile}.mp4 + *-poster.png
@@ -24,10 +24,10 @@ CHAPTERS=(
 for line in "${CHAPTERS[@]}"; do
   read -r name start end <<<"$line"
   echo "== $name ($start .. $end) =="
-  # Desktop: native resolution, frame-accurate cut (decode + re-encode), short GOP for scrubbing.
+  # Desktop: 1080p cap (the 2K source blows the byte budget), frame-accurate cut, short GOP.
   ffmpeg -v error -y -ss "$start" -to "$end" -i "$SRC" -an \
-    -vf "unsharp=5:5:0.8:5:5:0.0" \
-    -c:v libx264 -preset slow -crf 20 -pix_fmt yuv420p \
+    -vf "scale=-2:'min(1080,ih)',unsharp=5:5:0.8:5:5:0.0" \
+    -c:v libx264 -preset slow -crf 21 -pix_fmt yuv420p \
     -g 8 -keyint_min 8 -sc_threshold 0 -movflags +faststart "$OUT/$name.mp4"
   # Mobile: 720p cap, tighter GOP.
   ffmpeg -v error -y -ss "$start" -to "$end" -i "$SRC" -an \
