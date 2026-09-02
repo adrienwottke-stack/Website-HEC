@@ -1,7 +1,7 @@
 {
   "name": "HEC. High Energy Circle Dresden",
   "short_name": "HEC",
-  "description": "High Energy Circle: Studenten-Community in Dresden mit vier festen Terminen pro Woche.",
+  "description": "High Energy Circle: Community in Dresden mit vier festen Terminen pro Woche.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#070606",

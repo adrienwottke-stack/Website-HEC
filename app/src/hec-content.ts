@@ -13,7 +13,7 @@ export const SITE_URL = (SITE_URL_ENV || "https://website-hec.vercel.app").repla
 export const SITE_NAME = "HEC";
 export const SITE_TITLE = "HEC. High Energy Circle Dresden";
 export const SITE_DESCRIPTION =
-  "High Energy Circle: Studenten-Community in Dresden mit vier festen Terminen pro Woche. Ziele, Sport, Autos, Nächte. Rein über WhatsApp.";
+  "High Energy Circle: Community in Dresden mit vier festen Terminen pro Woche. Ziele, Sport, Autos, Nächte. Rein über WhatsApp.";
 export const THEME_COLOR = "#070606";
 
 /** The one CTA label on the whole page (one label per intent). */

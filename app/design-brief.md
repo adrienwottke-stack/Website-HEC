@@ -4,7 +4,7 @@ Live: https://high-energy-circle.higgsfield.app · type: website · template: sc
 
 ## Design read
 
-Students in Dresden, 18 to 27, arriving on a phone from a WhatsApp or Instagram link. Emotional register: raw, loud, direct. The page has one job: get them into the WhatsApp group. No motivational-poster tone, no filler.
+People in Dresden who want to get things done (not a student club), mostly 18 to 30, arriving on a phone from a WhatsApp or Instagram link. Emotional register: raw, loud, direct. The page has one job: get them into the WhatsApp group. No motivational-poster tone, no filler.
 
 ## Concept spine: "Zündung" (ignition)
 
