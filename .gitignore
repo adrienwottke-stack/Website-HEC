@@ -1,1 +1,9 @@
 node_modules
+
+# HEC working files (raw film, downloads)
+refs/film/
+refs/*.zip
+refs/raw/
+
+# local tooling
+.claude/

@@ -52,6 +52,8 @@ export interface ScrollScrubProps {
   theme: ScrollScrubTheme;
   className?: string;
   onActiveSectionChange?: (index: number) => void;
+  /** Extra layers rendered inside the sticky stage: above the media, below the chrome. */
+  stageChildren?: ReactNode;
 }
 
 interface Segment {
@@ -172,6 +174,7 @@ export function ScrollScrub({
   theme,
   className,
   onActiveSectionChange,
+  stageChildren,
 }: ScrollScrubProps) {
   const rootRef = useRef<HTMLElement>(null);
   const controllerRef = useRef<Controller | null>(null);
@@ -628,6 +631,8 @@ export function ScrollScrub({
             );
           })}
         </div>
+
+        {stageChildren}
 
         <div aria-hidden="true" className="scroll-scrub__progress">
           <span />

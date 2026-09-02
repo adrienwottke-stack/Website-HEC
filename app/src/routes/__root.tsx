@@ -8,21 +8,16 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { button } from "@higgsfield/quanta/button";
-import { NotFound } from "@higgsfield/quanta/not-found";
 
 import appCss from "../styles.css?url";
 import { reportHiggsfieldError } from "../lib/higgsfield-error-reporting";
 // Page metadata (browser <title>/favicon + social og: tags) committed into the
-// repo by the marketplace meta API and read at BUILD time — no runtime fetch.
-// Editing it via the app settings UI rewrites this file and redeploys the app.
+// repo and read at BUILD time. Editing it via the app settings UI rewrites this
+// file and redeploys the app.
 import appMetaJson from "../app-meta.json";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL, THEME_COLOR } from "../hec-content";
 
 declare const __HF_DESIGN_INSPECTOR__: boolean;
-
-// Built-in defaults for any field that isn't set in app-meta.json.
-const DEFAULT_TITLE = "Higgsfield App";
-const DEFAULT_DESCRIPTION = "Higgsfield Generated Project";
 
 type AppMeta = {
   og_title?: string | null;
@@ -30,92 +25,112 @@ type AppMeta = {
   og_image_url?: string | null;
   favicon_url?: string | null;
   og_video_url?: string | null;
-  // Read by the Higgsfield platform (marketplace feed card), never by the
-  // app itself — keep it in this file, don't render it.
+  // Read by the platform (feed card), never rendered by the app itself.
   marketplace_cover_url?: string | null;
 };
 
 const appMeta = appMetaJson as AppMeta;
 
-// Build the document head (title / description / og: / twitter: / favicon) from
-// app-meta.json, falling back to the defaults above for any unset field.
-// og_title/og_description double as the browser <title> and meta description;
-// og_image_url (when set) also drives the twitter card + image. Built from
-// inline tag literals (conditional spreads for the optional image/favicon) so
-// it matches the head() shape TanStack expects.
-// favicon/og images live in THIS app's own /assets, so the host is never
-// inherent. app-meta.json may carry an absolute higgsfield-app URL with a STALE
-// host — baked from the app this one was copied/remixed/renamed from — which would
-// serve the wrong app's favicon/og. Strip any higgsfield-app host (prod
-// higgsfield.app + dev higgsfield-dev.app) down to a root-relative path so it
-// always resolves against whoever serves THIS page (preview / prod / custom
-// domain). Genuinely external URLs (a CDN image the owner set) are left absolute.
+// Arms the ignition veil BEFORE first paint so the intro never flashes the
+// finished hero: only when motion is allowed and this session has not seen
+// the intro yet. Everything else about the intro lives in client components.
+const ARM_IGNITION_SCRIPT =
+  '(function(){try{if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;' +
+  'if(window.sessionStorage.getItem("hec-ignited"))return;' +
+  'document.documentElement.setAttribute("data-ignition","armed");}catch(e){}})();';
+
 const APP_HOST_ZONES = ["higgsfield.app", "higgsfield-dev.app"];
 
+// app-meta.json may carry an absolute higgsfield-app URL with a stale host;
+// strip it to a root-relative path so it resolves against whoever serves THIS
+// page. Genuinely external URLs (a CDN image) are left absolute.
 function toOwnAssetUrl(value: string | null | undefined): string | null {
   if (!value) return null;
-  if (value.startsWith("/")) return value; // already root-relative
+  if (value.startsWith("/")) return value;
   try {
     const u = new URL(value);
     const isAppHost = APP_HOST_ZONES.some(
       (zone) => u.hostname === zone || u.hostname.endsWith(`.${zone}`),
     );
     if (isAppHost) return u.pathname + u.search;
-    return value; // external host (CDN, etc.) — keep absolute
+    return value;
   } catch {
-    return value; // not a parseable URL — leave as-is
+    return value;
   }
 }
 
+function absolute(value: string | null): string | null {
+  if (!value) return null;
+  return value.startsWith("/") ? `${SITE_URL}${value}` : value;
+}
+
 function buildHead(meta: AppMeta) {
-  const title = meta.og_title ?? DEFAULT_TITLE;
-  const description = meta.og_description ?? DEFAULT_DESCRIPTION;
-  const ogImage = toOwnAssetUrl(meta.og_image_url);
-  const favicon = toOwnAssetUrl(meta.favicon_url);
-  const ogVideo = toOwnAssetUrl(meta.og_video_url);
+  const ogTitle = meta.og_title ?? SITE_NAME;
+  const description = meta.og_description ?? SITE_DESCRIPTION;
+  const ogImage = absolute(toOwnAssetUrl(meta.og_image_url));
+  const favicon = toOwnAssetUrl(meta.favicon_url) ?? "/favicon.svg";
+  const ogVideo = absolute(toOwnAssetUrl(meta.og_video_url));
 
   return {
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { title: SITE_TITLE },
       { name: "description", content: description },
-      { name: "author", content: "Higgsfield" },
-      { property: "og:title", content: title },
+      { name: "author", content: SITE_NAME },
+      { name: "theme-color", content: THEME_COLOR },
+      { name: "robots", content: "index, follow, max-image-preview:large" },
+      { property: "og:title", content: ogTitle },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: SITE_NAME },
+      { property: "og:locale", content: "de_DE" },
+      { property: "og:url", content: SITE_URL },
       { name: "twitter:card", content: ogImage ? "summary_large_image" : "summary" },
-      { name: "twitter:site", content: "@Higgsfield" },
+      { name: "twitter:title", content: ogTitle },
+      { name: "twitter:description", content: description },
       ...(ogImage
         ? [
             { property: "og:image", content: ogImage },
             { name: "twitter:image", content: ogImage },
           ]
         : []),
-      // Cover video (og:video) — the animated counterpart of og:image; the
-      // Higgsfield feed cards also play it on hover.
       ...(ogVideo ? [{ property: "og:video", content: ogVideo }] : []),
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      ...(favicon ? [{ rel: "icon", href: favicon }] : []),
+      { rel: "icon", href: favicon },
+      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/icons/favicon-32.png" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/icons/apple-touch-icon.png" },
+      { rel: "manifest", href: "/site.webmanifest" },
+      {
+        rel: "preload",
+        href: "/fonts/Satoshi-VariableItalic.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous" as const,
+      },
+      {
+        rel: "preload",
+        href: "/fonts/Satoshi-Variable.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous" as const,
+      },
     ],
+    scripts: [{ children: ARM_IGNITION_SCRIPT }],
   };
 }
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-q-background-primary px-4">
-      <NotFound
-        className="mx-auto max-w-md"
-        icon={<span className="text-q-title-md-semi-bold text-q-text-primary">404</span>}
-        title="Page not found"
-        subtitle="The page you're looking for doesn't exist or has been moved."
-      >
-        <Link to="/" className={button({ variant: "primary", size: "md" }, "mt-3")}>
-          Go home
-        </Link>
-      </NotFound>
+    <div className="hec-center">
+      <div>
+        <h1>Nichts hier.</h1>
+        <p>Die Seite gibt es nicht oder nicht mehr.</p>
+        <Link to="/">Zur Startseite</Link>
+      </div>
     </div>
   );
 }
@@ -128,33 +143,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-q-background-primary px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-q-title-lg-semi-bold text-q-text-primary">This page didn't load</h1>
-        <p className="mt-2 text-q-body-sm-regular text-q-text-secondary">
-          Something went wrong on our end. You can try refreshing or head back home.
-        </p>
-        <div className="mt-4 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className={button({ variant: "primary", size: "md" })}
-          >
-            Try again
-          </button>
-          <a href="/" className={button({ variant: "outline", size: "md" })}>
-            Go home
-          </a>
-        </div>
+    <div className="hec-center">
+      <div>
+        <h1>Kurz gestolpert.</h1>
+        <p>Die Seite hat nicht geladen. Einmal neu versuchen.</p>
+        <button
+          type="button"
+          onClick={() => {
+            router.invalidate();
+            reset();
+          }}
+        >
+          Neu laden
+        </button>
       </div>
     </div>
   );
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  // Read the committed page metadata at build time (no runtime fetch).
   head: () => buildHead(appMeta),
   shellComponent: RootShell,
   component: RootComponent,
@@ -164,14 +171,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" data-theme="default-dark" style={{ colorScheme: "dark" }}>
-      {/* Marketplace apps are permanently dark: data-theme is pinned on <html>
-          above. Do not add quanta's bootstrapScript/ThemeController, a theme
-          toggle, or a light mode. */}
+    <html lang="de" data-theme="default-dark" style={{ colorScheme: "dark" }}>
       <head>
         <HeadContent />
       </head>
-      <body className="bg-q-background-primary text-q-text-primary">
+      <body>
+        <div className="hec-veil" aria-hidden="true" />
         {children}
         <Scripts />
       </body>

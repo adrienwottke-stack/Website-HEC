@@ -1,0 +1,1086 @@
+/* HEC (High Energy Circle) token layer + bespoke chrome.
+ * Palette = the user's explicit brand colors from the logo (see design-brief.md).
+ * Everything here sits outside the cascade layers on purpose so it wins over
+ * the template's Quanta base rules. */
+
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Variable.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-VariableItalic.woff2") format("woff2");
+  font-weight: 300 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --hec-ground: #070606;
+  --hec-ink: #f5efe8;
+  --hec-muted: #9a8f88;
+  --hec-accent: #ff2e14;
+  --hec-line: #2a1f1c;
+  --hec-heat-1: #ff7a1a;
+  --hec-heat-2: #ffd36b;
+  --hec-core: #fff4e0;
+  --hec-display: "Satoshi", "Helvetica Neue", Arial, sans-serif;
+  --hec-mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --hec-gutter: clamp(1.25rem, 6vw, 6rem);
+  --hec-ease-out: cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+html {
+  background: var(--hec-ground);
+  color: var(--hec-ink);
+  scroll-behavior: auto;
+}
+
+body {
+  background: var(--hec-ground);
+  color: var(--hec-ink);
+  font-family: var(--hec-display);
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--hec-accent);
+  color: var(--hec-ground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--hec-accent);
+  outline-offset: 3px;
+}
+
+/* ---------- shared type ---------- */
+
+.hec-eyebrow {
+  margin: 0 0 1rem;
+  font-family: var(--hec-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hec-accent);
+}
+
+.hec-h2 {
+  margin: 0;
+  font-family: var(--hec-display);
+  font-size: clamp(2.2rem, 5vw, 4.5rem);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.hec-mono {
+  font-family: var(--hec-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* ---------- ignition veil + canvas ---------- */
+
+.hec-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: var(--hec-ground);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+
+html[data-ignition="armed"] .hec-veil {
+  opacity: 1;
+  /* Safety: if scripts never take over, the veil lifts by itself. */
+  animation: hec-veil-safety 400ms ease 2600ms forwards;
+}
+
+html[data-ignition="impact"] .hec-veil,
+html[data-ignition="done"] .hec-veil {
+  opacity: 0;
+  animation: none;
+}
+
+.hec-ignition {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--hec-ground);
+  pointer-events: none;
+}
+
+/* ---------- journey (scroll-scrub) overrides ---------- */
+
+.hec-journey .scroll-scrub__stage {
+  background: var(--hec-ground);
+}
+
+.hec-journey .scroll-scrub__title {
+  max-width: 12ch;
+  font-family: var(--hec-display);
+  font-size: clamp(2.6rem, 6.4vw, 6.4rem);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.hec-journey .scroll-scrub__body {
+  max-width: 44ch;
+  font-family: var(--hec-display);
+  font-size: clamp(1.05rem, 1.35vw, 1.25rem);
+  font-weight: 500;
+  color: var(--hec-ink);
+}
+
+.hec-journey .scroll-scrub__kicker {
+  font-family: var(--hec-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--hec-accent);
+}
+
+.hec-journey .scroll-scrub__tags li {
+  border-color: var(--hec-line);
+  border-radius: 0;
+  font-family: var(--hec-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hec-muted);
+}
+
+.hec-journey .scroll-scrub__progress span {
+  background: linear-gradient(90deg, var(--hec-accent), var(--hec-heat-2));
+}
+
+.hec-journey .scroll-scrub__route {
+  top: auto;
+  right: var(--hec-gutter);
+  bottom: calc(1.25rem + env(safe-area-inset-bottom));
+  left: auto;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+}
+
+.hec-journey .scroll-scrub__route-button {
+  min-height: 0;
+  padding: 0.35rem 0;
+  font-family: var(--hec-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hec-muted);
+}
+
+.hec-journey .scroll-scrub__route-button[aria-current="step"] {
+  color: var(--hec-ink);
+  text-decoration-color: var(--hec-accent);
+}
+
+/* hero chapter: copy anchored bottom-left */
+.hec-journey #ignition .scroll-scrub__chapter-pin {
+  align-items: flex-end;
+  padding-bottom: clamp(4.5rem, 10vh, 7.5rem);
+}
+
+/* logo layer inside the sticky stage, driven by the engine's --ss-progress */
+.hec-hero-logo {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: clamp(0, 1 - var(--ss-progress, 0) * 7, 1);
+  transform: scale(calc(1 + var(--ss-progress, 0) * 2.4));
+  will-change: opacity, transform;
+}
+
+.hec-hero-logo img {
+  width: min(64vw, 34rem);
+  height: auto;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 40px rgba(255, 46, 20, 0.35));
+}
+
+html[data-ignition="impact"] .hec-hero-logo img {
+  animation: hec-logo-slam 760ms var(--hec-ease-out) both;
+}
+
+.hec-embers {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* hero copy: hidden under the veil while armed, slams in on impact */
+html[data-ignition="armed"] .hec-journey #ignition .scroll-scrub__copy {
+  animation: hec-copy-slam 620ms var(--hec-ease-out) 2500ms both;
+}
+
+html[data-ignition="impact"] .hec-journey #ignition .scroll-scrub__copy {
+  animation: hec-copy-slam 620ms var(--hec-ease-out) 220ms both;
+}
+
+/* ---------- nav ---------- */
+
+.hec-nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 var(--hec-gutter);
+  padding-top: env(safe-area-inset-top);
+  pointer-events: none;
+}
+
+.hec-nav > * {
+  pointer-events: auto;
+}
+
+html[data-ignition="armed"] .hec-nav {
+  animation: hec-nav-in 500ms var(--hec-ease-out) 2700ms both;
+}
+
+html[data-ignition="impact"] .hec-nav {
+  animation: hec-nav-in 500ms var(--hec-ease-out) 420ms both;
+}
+
+.hec-nav__mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--hec-ink);
+  text-decoration: none;
+  font-family: var(--hec-display);
+  font-size: 1.15rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+
+.hec-nav__ring {
+  width: 26px;
+  height: 26px;
+  color: var(--hec-accent);
+  filter: drop-shadow(0 0 6px rgba(255, 46, 20, 0.6));
+}
+
+.hec-nav__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2.25rem);
+}
+
+.hec-nav__link {
+  position: relative;
+  padding: 0.5rem 0;
+  font-family: var(--hec-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hec-ink);
+  text-decoration: none;
+}
+
+/* the one drawing-underline garment on the page: a hairline that heats up */
+.hec-nav__link::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0.15rem;
+  left: 0;
+  height: 1px;
+  background: var(--hec-line);
+  transform: scaleX(0.35);
+  transform-origin: left;
+  transition:
+    transform 360ms var(--hec-ease-out),
+    background 360ms,
+    box-shadow 360ms;
+}
+
+.hec-nav__link:hover::after,
+.hec-nav__link:focus-visible::after {
+  transform: scaleX(1);
+  background: var(--hec-accent);
+  box-shadow: 0 0 10px rgba(255, 46, 20, 0.75);
+}
+
+.hec-nav__link--cta {
+  color: var(--hec-accent);
+}
+
+@media (max-width: 640px) {
+  .hec-nav__link--plain {
+    display: none;
+  }
+}
+
+/* ---------- CTA garment 1: viewfinder brackets + magnet ---------- */
+
+.hec-viewfinder {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 1.05rem 1.7rem;
+  font-family: var(--hec-display);
+  font-size: 1.05rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--hec-ink);
+  text-decoration: none;
+  will-change: transform;
+}
+
+.hec-viewfinder__corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--hec-accent);
+  transition:
+    transform 340ms var(--hec-ease-out),
+    box-shadow 340ms;
+}
+
+.hec-viewfinder__corner--tl {
+  top: 0;
+  left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  transform: translate(-9px, -9px);
+}
+.hec-viewfinder__corner--tr {
+  top: 0;
+  right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  transform: translate(9px, -9px);
+}
+.hec-viewfinder__corner--bl {
+  bottom: 0;
+  left: 0;
+  border-top: 0;
+  border-right: 0;
+  transform: translate(-9px, 9px);
+}
+.hec-viewfinder__corner--br {
+  right: 0;
+  bottom: 0;
+  border-top: 0;
+  border-left: 0;
+  transform: translate(9px, 9px);
+}
+
+.hec-viewfinder:hover .hec-viewfinder__corner,
+.hec-viewfinder:focus-visible .hec-viewfinder__corner {
+  transform: translate(0, 0);
+  box-shadow: 0 0 14px rgba(255, 46, 20, 0.6);
+}
+
+.hec-viewfinder__label {
+  position: relative;
+  display: inline-block;
+  transition: letter-spacing 340ms var(--hec-ease-out);
+}
+
+.hec-viewfinder:hover .hec-viewfinder__label {
+  letter-spacing: 0.06em;
+}
+
+.hec-viewfinder__dot {
+  width: 8px;
+  height: 8px;
+  margin-right: 0.85rem;
+  background: var(--hec-accent);
+  box-shadow: 0 0 10px rgba(255, 46, 20, 0.9);
+  animation: hec-rec 1.6s ease-in-out infinite;
+}
+
+.hec-viewfinder:active {
+  transform: scale(0.98);
+}
+
+/* ---------- CTA garment 2: orbit link ---------- */
+
+.hec-orbit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-family: var(--hec-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hec-ink);
+  text-decoration: none;
+}
+
+.hec-orbit__glyph {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+}
+
+.hec-orbit__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--hec-line);
+  stroke-width: 1.5;
+  transition: stroke 300ms;
+}
+
+.hec-orbit__trace {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: var(--hec-accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 126;
+  stroke-dashoffset: 126;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 900ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.hec-orbit__dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background: var(--hec-heat-2);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 211, 107, 0.9);
+  offset-path: circle(20px at 23px 23px);
+  offset-distance: 0%;
+  offset-rotate: 0deg;
+  transition: offset-distance 900ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.hec-orbit:hover .hec-orbit__ring,
+.hec-orbit:focus-visible .hec-orbit__ring {
+  stroke: rgba(255, 46, 20, 0.35);
+}
+
+.hec-orbit:hover .hec-orbit__trace,
+.hec-orbit:focus-visible .hec-orbit__trace {
+  stroke-dashoffset: 0;
+}
+
+.hec-orbit:hover .hec-orbit__dot,
+.hec-orbit:focus-visible .hec-orbit__dot {
+  offset-distance: 100%;
+}
+
+.hec-orbit__label {
+  border-bottom: 1px solid transparent;
+  transition: color 300ms;
+}
+
+.hec-orbit:hover .hec-orbit__label {
+  color: var(--hec-heat-2);
+}
+
+/* ---------- chapter 2: the ledger ---------- */
+
+.hec-ledger {
+  position: relative;
+  display: grid;
+  width: 100%;
+  margin: 0.5rem 0 0;
+  border-top: 1px solid var(--hec-line);
+}
+
+.hec-ledger__row {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 1rem;
+  padding: 0.85rem 0.5rem 0.85rem 0;
+  border-bottom: 1px solid var(--hec-line);
+  transition:
+    transform 300ms var(--hec-ease-out),
+    background 300ms,
+    border-color 300ms;
+}
+
+.hec-ledger__row:hover {
+  transform: skewX(-6deg) translateX(8px);
+  background: linear-gradient(90deg, rgba(255, 46, 20, 0.18), transparent 70%);
+  border-color: var(--hec-accent);
+}
+
+.hec-ledger__row dt {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-family: var(--hec-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hec-ledger__day {
+  color: var(--hec-accent);
+  font-weight: 500;
+}
+
+.hec-ledger__time {
+  color: var(--hec-muted);
+}
+
+.hec-ledger__row dd {
+  margin: 0;
+}
+
+.hec-ledger__row dd strong {
+  display: block;
+  font-family: var(--hec-display);
+  font-size: 1.05rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.hec-ledger__row dd span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.92rem;
+  color: var(--hec-muted);
+}
+
+/* second-read moment: one oversized outlined numeral behind the ledger */
+.hec-ledger__numeral {
+  position: absolute;
+  top: -0.55em;
+  right: -0.15em;
+  z-index: -1;
+  font-family: var(--hec-display);
+  font-size: clamp(9rem, 22vw, 18rem);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 46, 20, 0.35);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------- chapter 3: readouts ---------- */
+
+.hec-readouts {
+  display: grid;
+  width: 100%;
+  gap: 0.6rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hec-readouts li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.8rem;
+  align-items: baseline;
+  font-family: var(--hec-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hec-readouts li:nth-child(even) {
+  transform: translateX(1.4rem);
+}
+
+.hec-readouts__label {
+  color: var(--hec-accent);
+  font-weight: 500;
+}
+
+.hec-readouts__text {
+  color: var(--hec-muted);
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* ---------- reels ---------- */
+
+.hec-reels {
+  position: relative;
+  padding: clamp(5rem, 10vw, 8rem) var(--hec-gutter);
+  background: var(--hec-ground);
+  isolation: isolate;
+}
+
+.hec-reels__plate {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.hec-reels__strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+
+.hec-reel {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border: 1px solid var(--hec-line);
+  background: #000;
+}
+
+.hec-reel__facade {
+  all: unset;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.hec-reel__facade:focus-visible {
+  outline: 2px solid var(--hec-accent);
+  outline-offset: -4px;
+}
+
+.hec-reel__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+  transition: transform 700ms var(--hec-ease-out), opacity 400ms;
+}
+
+.hec-reel__facade:hover .hec-reel__poster {
+  transform: scale(1.04);
+  opacity: 1;
+}
+
+.hec-reel__ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border: 2px solid var(--hec-accent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 26px rgba(255, 46, 20, 0.45),
+    inset 0 0 18px rgba(255, 46, 20, 0.25);
+  transition: transform 340ms var(--hec-ease-out), box-shadow 340ms;
+}
+
+.hec-reel__facade:hover .hec-reel__ring {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 40px rgba(255, 46, 20, 0.7),
+    inset 0 0 22px rgba(255, 46, 20, 0.4);
+}
+
+.hec-reel__ring svg {
+  width: 26px;
+  height: 26px;
+  margin-left: 4px;
+  fill: var(--hec-ink);
+}
+
+.hec-reel__caption {
+  position: absolute;
+  right: 0.9rem;
+  bottom: 0.9rem;
+  left: 0.9rem;
+  font-family: var(--hec-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hec-ink);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+}
+
+.hec-reel iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+}
+
+@media (max-width: 860px) {
+  .hec-reels__strip {
+    display: flex;
+    gap: 1rem;
+    margin-inline: calc(var(--hec-gutter) * -1);
+    padding-inline: var(--hec-gutter);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .hec-reels__strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hec-reel {
+    flex: 0 0 76vw;
+    scroll-snap-align: center;
+  }
+}
+
+/* ---------- final band (CTA garment 3: the band is the link) ---------- */
+
+.hec-band {
+  position: relative;
+  display: grid;
+  align-content: center;
+  min-height: 72vh;
+  padding: clamp(4rem, 10vw, 8rem) var(--hec-gutter);
+  overflow: hidden;
+  color: var(--hec-ink);
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform 520ms var(--hec-ease-out);
+}
+
+.hec-band__plate {
+  position: absolute;
+  inset: -4%;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.75;
+  transition:
+    transform 800ms var(--hec-ease-out),
+    opacity 500ms,
+    filter 500ms;
+}
+
+.hec-band:hover {
+  transform: skewX(-2deg);
+}
+
+.hec-band:hover .hec-band__plate,
+.hec-band:focus-visible .hec-band__plate {
+  transform: scale(1.05) skewX(2deg);
+  opacity: 1;
+  filter: saturate(1.35) brightness(1.1);
+}
+
+.hec-band__title {
+  margin: 0;
+  font-family: var(--hec-display);
+  font-size: clamp(3rem, 9vw, 8.5rem);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.hec-band__text {
+  max-width: 34ch;
+  margin: 1.5rem 0 0;
+  font-size: clamp(1rem, 1.3vw, 1.2rem);
+  color: var(--hec-ink);
+}
+
+.hec-band__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 2.25rem;
+  font-family: var(--hec-mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--hec-accent);
+}
+
+.hec-band__cta svg {
+  width: 28px;
+  height: 14px;
+  transition: transform 400ms var(--hec-ease-out);
+}
+
+.hec-band:hover .hec-band__cta svg {
+  transform: translateX(10px);
+}
+
+/* ---------- footer ---------- */
+
+.hec-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  padding: 2rem var(--hec-gutter) calc(2rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--hec-line);
+  font-family: var(--hec-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hec-muted);
+}
+
+.hec-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.hec-footer a {
+  color: var(--hec-muted);
+  text-decoration: none;
+  transition: color 240ms;
+}
+
+.hec-footer a:hover,
+.hec-footer a:focus-visible {
+  color: var(--hec-ink);
+}
+
+/* ---------- legal + utility pages ---------- */
+
+.hec-page {
+  min-height: 100dvh;
+  padding: 8rem var(--hec-gutter) 4rem;
+}
+
+.hec-legal {
+  max-width: 68ch;
+}
+
+.hec-legal h1 {
+  margin: 0 0 2rem;
+  font-family: var(--hec-display);
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 0.94;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.hec-legal h2 {
+  margin: 2.25rem 0 0.6rem;
+  font-family: var(--hec-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hec-accent);
+}
+
+.hec-legal p,
+.hec-legal li {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--hec-ink);
+}
+
+.hec-legal a {
+  color: var(--hec-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--hec-accent);
+  text-underline-offset: 0.2em;
+}
+
+.hec-legal address {
+  font-style: normal;
+  line-height: 1.6;
+}
+
+.hec-center {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: var(--hec-gutter);
+  text-align: center;
+}
+
+.hec-center h1 {
+  margin: 0 0 1rem;
+  font-family: var(--hec-display);
+  font-size: clamp(2.4rem, 8vw, 6rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+.hec-center p {
+  margin: 0 0 2rem;
+  color: var(--hec-muted);
+}
+
+.hec-center a,
+.hec-center button {
+  all: unset;
+  display: inline-block;
+  padding: 0.8rem 1.4rem;
+  border: 1px solid var(--hec-accent);
+  font-family: var(--hec-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--hec-ink);
+  cursor: pointer;
+}
+
+.hec-center a:hover,
+.hec-center button:hover {
+  background: rgba(255, 46, 20, 0.15);
+}
+
+/* ---------- keyframes ---------- */
+
+@keyframes hec-veil-safety {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes hec-logo-slam {
+  0% {
+    transform: scale(1.7);
+    filter: brightness(3) blur(8px) drop-shadow(0 0 60px rgba(255, 122, 26, 0.9));
+  }
+  55% {
+    transform: scale(0.96);
+    filter: brightness(1.4) blur(0) drop-shadow(0 0 50px rgba(255, 46, 20, 0.6));
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1) blur(0) drop-shadow(0 0 40px rgba(255, 46, 20, 0.35));
+  }
+}
+
+@keyframes hec-copy-slam {
+  0% {
+    opacity: 0;
+    transform: translateY(28px) scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hec-nav-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hec-rec {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ---------- reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .hec-ignition,
+  .hec-embers,
+  .hec-veil {
+    display: none;
+  }
+
+  .hec-hero-logo {
+    transform: none;
+  }
+
+  .hec-nav,
+  .hec-journey #ignition .scroll-scrub__copy,
+  .hec-hero-logo img,
+  .hec-viewfinder__dot {
+    animation: none !important;
+  }
+
+  .hec-ledger__row,
+  .hec-band,
+  .hec-band__plate,
+  .hec-reel__poster,
+  .hec-reel__ring,
+  .hec-viewfinder__corner,
+  .hec-orbit__dot,
+  .hec-orbit__trace,
+  .hec-nav__link::after {
+    transition: none !important;
+  }
+}
