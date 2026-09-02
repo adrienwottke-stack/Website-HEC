@@ -242,7 +242,7 @@ html[data-ignition="done"] .hec-veil {
   width: min(64vw, 34rem);
   height: auto;
   mix-blend-mode: screen;
-  filter: drop-shadow(0 0 40px rgba(255, 46, 20, 0.35));
+  /* no drop-shadow: the PNG is opaque, a shadow would outline its square */
 }
 
 html[data-ignition="impact"] .hec-hero-logo img {
@@ -1017,15 +1017,15 @@ html[data-ignition="impact"] .hec-nav {
 @keyframes hec-logo-slam {
   0% {
     transform: scale(1.7);
-    filter: brightness(3) blur(8px) drop-shadow(0 0 60px rgba(255, 122, 26, 0.9));
+    filter: brightness(3) blur(8px);
   }
   55% {
     transform: scale(0.96);
-    filter: brightness(1.4) blur(0) drop-shadow(0 0 50px rgba(255, 46, 20, 0.6));
+    filter: brightness(1.4) blur(0);
   }
   100% {
     transform: scale(1);
-    filter: brightness(1) blur(0) drop-shadow(0 0 40px rgba(255, 46, 20, 0.35));
+    filter: brightness(1) blur(0);
   }
 }
 
