@@ -1,6 +1,7 @@
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
+import { nitro } from "nitro/vite";
 import {
   higgsfieldDesignInspectorVitePlugin,
   higgsfieldDesignSourceBabelPlugin,
@@ -18,6 +19,35 @@ const QUANTA_ICONS_SHIM = fileURLToPath(
   new URL("./src/lib/quanta-icons.ts", import.meta.url),
 );
 
+// Two deploy targets share this config:
+// - "higgsfield" (default): the Cloudflare-Worker build the Higgsfield platform
+//   deploys (custom `src/server.ts` entry, edge-bundled SSR).
+// - "vercel": Vercel via nitro's Build Output API preset. The three pages are
+//   prerendered to static HTML at build time; /robots.txt and /sitemap.xml
+//   stay server routes on the serverless fallback. Vercel sets VERCEL=1 itself,
+//   DEPLOY_TARGET=vercel forces it locally.
+const deployTarget = process.env.DEPLOY_TARGET ?? (process.env.VERCEL ? "vercel" : "higgsfield");
+const isVercel = deployTarget === "vercel";
+
+// Mirrors src/lib/security-headers.server.ts, which only runs inside the
+// Worker entry. On Vercel the headers are attached through nitro route rules.
+const SECURITY_HEADERS: Record<string, string> = {
+  "Content-Security-Policy":
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline'; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "font-src 'self' https://fonts.gstatic.com; " +
+    "img-src 'self' data: https:; media-src 'self' blob: https:; " +
+    "connect-src 'self' https:; " +
+    "frame-src 'self' https://www.instagram.com; " +
+    "base-uri 'self'; form-action 'self'",
+  "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+  "X-XSS-Protection": "0",
+};
+
 export default defineConfig(({ command, mode }) => {
   const designInspectorEnabled = process.env.HF_DESIGN_INSPECTOR === "1" || mode === "design";
 
@@ -32,50 +62,39 @@ export default defineConfig(({ command, mode }) => {
       tsconfigPaths: true,
       alias: [{ find: /^@higgsfield-ai\/icons(\/.*)?$/, replacement: QUANTA_ICONS_SHIM }],
     },
-    // The server bundle runs as a Cloudflare Worker — there is no node_modules
-    // at runtime. Vite's default SSR build leaves npm deps as bare external
-    // imports (h3, react, @tanstack/*, seroval, …), which resolve on a Node
-    // server but throw "No such module" in a Worker. Bundle them all in.
-    // (node: builtins stay external — nodejs_compat provides them.)
-    // BUILD ONLY: `vite dev` SSR runs in Node where externalized deps are
-    // correct — noExternal there makes the dev module runner evaluate CJS
-    // deps (react) as ESM and crash with "module is not defined".
-    ssr: {
-      // BUILD ONLY: the SSR bundle runs on workerd (Cloudflare Workers), not
-      // Node. Target a worker runtime and resolve bundled deps through the
-      // edge export conditions (workerd/worker/browser) so packages that ship
-      // both variants bundle their edge build (react-dom's web-streams server,
-      // etc.) instead of the Node variant leaning on nodejs_compat shims.
-      // `vite dev` SSR runs in Node, where default node resolution is correct.
-      ...(command === "build"
-        ? {
-            target: "webworker" as const,
-            resolve: {
-              conditions: [
-                "workerd",
-                "worker",
-                "browser",
-                ...defaultServerConditions.filter((c) => c !== "node"),
-              ],
-            },
-          }
-        : {}),
-      noExternal: command === "build" ? true : undefined,
-      // `cloudflare:workers` is a workerd runtime built-in that exposes the Worker
-      // env / bindings (D1 `DB`, R2 `STORAGE`). Like node: builtins it must NOT be
-      // bundled; the runtime provides it. (`ssr.external` is typed string[].)
-      external: ["cloudflare:workers"],
-    },
-    build: {
-      // Keep `cloudflare:*` external in the SSR rollup pass too — `noExternal`
-      // above would otherwise try to resolve+bundle it and fail.
-      rollupOptions: { external: [/^cloudflare:/] },
-    },
+    // Higgsfield target only: the server bundle runs as a Cloudflare Worker with
+    // no node_modules at runtime, so every dependency is bundled in and resolved
+    // through the edge export conditions. `vite dev` and the Vercel (Node) build
+    // keep Vite's default SSR behaviour.
+    ssr: isVercel
+      ? {}
+      : {
+          ...(command === "build"
+            ? {
+                target: "webworker" as const,
+                resolve: {
+                  conditions: [
+                    "workerd",
+                    "worker",
+                    "browser",
+                    ...defaultServerConditions.filter((c) => c !== "node"),
+                  ],
+                },
+              }
+            : {}),
+          noExternal: command === "build" ? true : undefined,
+          // `cloudflare:workers` is a workerd runtime built-in that exposes the
+          // Worker env / bindings. It must NOT be bundled; the runtime provides it.
+          external: ["cloudflare:workers"],
+        },
+    build: isVercel
+      ? {}
+      : {
+          // Keep `cloudflare:*` external in the SSR rollup pass too.
+          rollupOptions: { external: [/^cloudflare:/] },
+        },
     plugins: [
-      // Local SVG assets (e.g. the branded generate-button sparkle) import as
-      // React components via `?react`. `icon: true` sizes them 1em; fill is
-      // forced to currentColor so they color like text. Keep the viewBox so
-      // CSS sizing scales the glyph.
+      // Local SVG assets import as React components via `?react`.
       svgr({
         svgrOptions: {
           icon: true,
@@ -87,19 +106,33 @@ export default defineConfig(({ command, mode }) => {
       }),
       // TanStack Start plugin must run before React's plugin.
       //
-      // SSR build: `vite build` emits a Workers-shaped server bundle
-      // (dist/server/server.js — `export default { fetch }`) plus dist/client
-      // (hashed static assets). The platform publishes that as a per-tenant
-      // Worker on Workers for Platforms, served at <sub>.higgsfield.app/ (host
-      // root, so Vite's default base "/" — no base-path juggling).
-      //
-      // Rendering happens on the server per request, so site code must be
-      // SSR-safe: never touch browser-only globals (window, document,
-      // localStorage, navigator) during render or at module top level — only
-      // inside effects/handlers, or guarded with `typeof window !== "undefined"`.
-      tanstackStart({
-        server: { entry: "server" },
-      }),
+      // Higgsfield: `vite build` emits a Workers-shaped server bundle
+      // (dist/server/server.js, `export default { fetch }`) plus dist/client.
+      // Vercel: nitro owns the server entry; the public pages are prerendered.
+      // Either way rendering happens on the server, so site code must be
+      // SSR-safe (no browser globals during render or at module top level).
+      tanstackStart(
+        isVercel
+          ? {
+              prerender: {
+                enabled: true,
+                crawlLinks: true,
+                failOnError: true,
+              },
+              pages: [{ path: "/" }, { path: "/impressum" }, { path: "/datenschutz" }],
+            }
+          : { server: { entry: "server" } },
+      ),
+      ...(isVercel
+        ? [
+            nitro({
+              preset: "vercel",
+              routeRules: {
+                "/**": { headers: SECURITY_HEADERS },
+              },
+            }),
+          ]
+        : []),
       higgsfieldDesignInspectorVitePlugin(designInspectorEnabled),
       react({
         babel: {

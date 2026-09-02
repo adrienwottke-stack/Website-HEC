@@ -3,7 +3,13 @@
  * links, schedule, channels, reels, legal data, metadata. No JSX in here.
  */
 
-export const SITE_URL = "https://high-energy-circle.higgsfield.app";
+/** Public origin of the site (canonical, og:url, JSON-LD). Set VITE_SITE_URL in
+ * the hosting environment (Vercel: Project Settings > Environment Variables). */
+const SITE_URL_ENV = (import.meta.env.VITE_SITE_URL as string | undefined)?.trim();
+export const SITE_URL = (SITE_URL_ENV || "https://high-energy-circle.higgsfield.app").replace(
+  /\/+$/,
+  "",
+);
 export const SITE_NAME = "HEC";
 export const SITE_TITLE = "HEC. High Energy Circle Dresden";
 export const SITE_DESCRIPTION =

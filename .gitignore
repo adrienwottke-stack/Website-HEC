@@ -7,3 +7,9 @@ refs/raw/
 
 # local tooling
 .claude/
+
+# Vercel / nitro build output
+.vercel/
+.output/
+app/.vercel/
+app/.output/
