@@ -1119,3 +1119,10 @@ html[data-ignition="impact"] .hec-nav {
     padding: 0.95rem 1.4rem;
   }
 }
+
+@media (max-width: 860px) {
+  /* the desktop hero copy width must not shrink the mobile column */
+  .hec-journey #ignition .scroll-scrub__copy {
+    width: min(100%, 36rem);
+  }
+}
