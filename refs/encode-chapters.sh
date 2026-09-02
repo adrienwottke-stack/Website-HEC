@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 # Cut the seam-locked HEC film chain into the chapter segments the scrub engine
-# expects (one clip per scene), encode desktop (1080p cap) + mobile (720p cap)
-# variants, and extract the exact first-frame posters from the ENCODED clips.
+# expects (one clip per scene), encode desktop + mobile variants, and extract
+# the exact first-frame posters from the ENCODED clips.
 #
 # Sources (refs/film/): source.mp4 = act 1 (ring), leg2.mp4 = meteor flight,
 # leg3.mp4 = atmosphere entry + impact. Each leg starts on the previous leg's
 # actual last frame, so the chapter cuts are cuts of one continuous take.
+# The meteor legs are far busier (sparks, explosions), so they get a 900p cap
+# and a higher CRF to stay inside the byte budget (desktop <= 32 MiB, mobile
+# <= 16 MiB for the whole chain).
 #
-# Usage: bash refs/encode-chapters.sh
+# Usage: bash refs/encode-chapters.sh [chapter ...]   (no args = all)
 # Output: app/public/assets/world/<chapter>{,-mobile}.mp4 + *-poster.jpg
 
 set -euo pipefail
@@ -16,21 +19,25 @@ OUT="app/public/assets/world"
 mkdir -p "$OUT"
 command -v ffmpeg >/dev/null 2>&1 || { echo "ffmpeg missing" >&2; exit 127; }
 
-# chapter    source                 start  end    crf-desktop crf-mobile
+# chapter    source                 start  end    height crf-desktop crf-mobile
 SEGMENTS=(
-  "ignition   refs/film/source.mp4   0.00   6.75  21 23"
-  "was-hec    refs/film/source.mp4   6.75  15.00  21 23"
-  "stationen  refs/film/leg2.mp4     0.00  15.00  22 25"
-  "eintritt   refs/film/leg3.mp4     0.00   7.50  22 25"
-  "einschlag  refs/film/leg3.mp4     7.50  15.00  22 25"
+  "ignition   refs/film/source.mp4   0.00   6.75  1080 21 23"
+  "was-hec    refs/film/source.mp4   6.75  15.00  1080 21 23"
+  "stationen  refs/film/leg2.mp4     0.00  15.00   900 25 28"
+  "eintritt   refs/film/leg3.mp4     0.00   7.50   900 25 28"
+  "einschlag  refs/film/leg3.mp4     7.50  15.00   900 25 28"
 )
 
+wanted=("$@")
 for line in "${SEGMENTS[@]}"; do
-  read -r name src start end crfd crfm <<<"$line"
+  read -r name src start end height crfd crfm <<<"$line"
+  if [ ${#wanted[@]} -gt 0 ]; then
+    keep=0; for w in "${wanted[@]}"; do [ "$w" = "$name" ] && keep=1; done; [ $keep -eq 1 ] || continue
+  fi
   [ -f "$src" ] || { echo "skip $name: $src missing"; continue; }
-  echo "== $name <- $src ($start .. $end) =="
+  echo "== $name <- $src ($start .. $end, ${height}p) =="
   ffmpeg -v error -y -ss "$start" -to "$end" -i "$src" -an \
-    -vf "scale=-2:'min(1080,ih)',unsharp=5:5:0.8:5:5:0.0" \
+    -vf "scale=-2:'min($height,ih)',unsharp=5:5:0.8:5:5:0.0" \
     -c:v libx264 -preset slow -crf "$crfd" -pix_fmt yuv420p \
     -g 8 -keyint_min 8 -sc_threshold 0 -movflags +faststart "$OUT/$name.mp4"
   ffmpeg -v error -y -ss "$start" -to "$end" -i "$src" -an \
