@@ -29,7 +29,17 @@ export default function IgnitionIntro({ onImpact, onDone }: IgnitionIntroProps) 
     window.addEventListener("keydown", skip);
     window.addEventListener("wheel", skip, { passive: true });
     window.addEventListener("touchstart", skip, { passive: true });
+    // Watchdog: if no animation frame ever runs while the page is visible
+    // (embedded/previews that throttle rAF), never leave the veil standing.
+    const watchdog = window.setTimeout(() => {
+      if (!handle.started() && document.visibilityState === "visible") {
+        handle.destroy();
+        callbacks.current.onImpact();
+        callbacks.current.onDone();
+      }
+    }, 3500);
     return () => {
+      window.clearTimeout(watchdog);
       window.removeEventListener("pointerdown", skip);
       window.removeEventListener("keydown", skip);
       window.removeEventListener("wheel", skip);

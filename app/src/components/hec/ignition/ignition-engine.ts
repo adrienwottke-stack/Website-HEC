@@ -13,6 +13,8 @@ export interface IgnitionCallbacks {
 export interface IgnitionHandle {
   skip: () => void;
   destroy: () => void;
+  /** True once the first animation frame has run. */
+  started: () => boolean;
 }
 
 interface Particle {
@@ -78,7 +80,7 @@ export function runIgnition(
   if (!ctx) {
     cb.onImpact?.();
     cb.onDone?.();
-    return { skip() {}, destroy() {} };
+    return { skip() {}, destroy() {}, started: () => true };
   }
 
   const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 2);
@@ -371,6 +373,7 @@ export function runIgnition(
       window.removeEventListener("resize", resize);
       particles.length = 0;
     },
+    started: () => start > 0,
   };
 }
 
