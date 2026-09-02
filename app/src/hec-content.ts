@@ -6,7 +6,7 @@
 /** Public origin of the site (canonical, og:url, JSON-LD). Set VITE_SITE_URL in
  * the hosting environment (Vercel: Project Settings > Environment Variables). */
 const SITE_URL_ENV = (import.meta.env.VITE_SITE_URL as string | undefined)?.trim();
-export const SITE_URL = (SITE_URL_ENV || "https://high-energy-circle.higgsfield.app").replace(
+export const SITE_URL = (SITE_URL_ENV || "https://website-hec.vercel.app").replace(
   /\/+$/,
   "",
 );
