@@ -19,11 +19,15 @@ export const WHATSAPP_URL = "https://chat.whatsapp.com/INPUT_PENDING";
 /** Instagram profile URL. Leave empty to hide the footer link. */
 export const INSTAGRAM_URL = "";
 
+/** Glyphs from the generated icon set under /assets/icons/. */
+export type IconName = "bolt" | "ring" | "dumbbell" | "car" | "sunrise" | "bubble";
+
 export interface ScheduleRow {
   day: string;
   time: string;
   name: string;
   text: string;
+  icon: IconName;
 }
 
 export const SCHEDULE: ScheduleRow[] = [
@@ -32,38 +36,43 @@ export const SCHEDULE: ScheduleRow[] = [
     time: "19:00",
     name: "Power Meeting",
     text: "Energiekreis, Autos, Talk über Ziele und Motivation.",
+    icon: "bolt",
   },
   {
     day: "MI",
     time: "abends",
     name: "Sport + Vision Talk",
     text: "Erst Training, dann reden wir über deine Ziele.",
+    icon: "dumbbell",
   },
   {
     day: "FR",
     time: "abends",
     name: "Freizeit",
     text: "Club, Treffen, Auto, Bar. Jede Woche was anderes.",
+    icon: "car",
   },
   {
     day: "SO",
     time: "nachmittags",
     name: "Vision Walk",
     text: "Wochenrückblick. Was lief, was nicht, was kommt.",
+    icon: "sunrise",
   },
 ];
 
 export interface ChannelReadout {
   label: string;
   text: string;
+  icon: IconName;
 }
 
 export const CHANNELS: ChannelReadout[] = [
-  { label: "GM", text: "jeden Morgen" },
-  { label: "Wins", text: "deine Erfolge" },
-  { label: "Learning", text: "der Woche" },
-  { label: "Vision", text: "dein Ziel, dein Weg" },
-  { label: "Termine", text: "Orte und Zeiten der Woche" },
+  { label: "GM", text: "jeden Morgen", icon: "sunrise" },
+  { label: "Wins", text: "deine Erfolge", icon: "bolt" },
+  { label: "Learning", text: "der Woche", icon: "bubble" },
+  { label: "Vision", text: "dein Ziel, dein Weg", icon: "ring" },
+  { label: "Termine", text: "Orte und Zeiten der Woche", icon: "car" },
 ];
 
 export interface Reel {

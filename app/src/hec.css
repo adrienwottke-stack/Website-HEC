@@ -1126,3 +1126,82 @@ html[data-ignition="impact"] .hec-nav {
     width: min(100%, 36rem);
   }
 }
+
+/* ---------- board-faithful refinements (refs/boards) ---------- */
+
+/* ledger board: names in accent red with a hairline underline */
+.hec-ledger__row dd strong {
+  color: var(--hec-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  text-decoration-color: rgba(255, 46, 20, 0.55);
+}
+
+.hec-ledger__row:hover dd strong {
+  text-decoration-color: var(--hec-accent);
+}
+
+/* readouts board: label in ink, value in accent, offsets alternate around center */
+.hec-readouts__label {
+  color: var(--hec-ink);
+}
+
+.hec-readouts__text {
+  color: var(--hec-accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hec-readouts li:nth-child(even) {
+  transform: translateX(2.2rem);
+}
+
+.hec-readouts li:nth-child(3) {
+  transform: translateX(0.6rem);
+}
+
+/* reels board: eyebrow with short dashes */
+.hec-reels .hec-eyebrow::before,
+.hec-reels .hec-eyebrow::after {
+  content: "";
+  display: inline-block;
+  width: 1.4rem;
+  height: 1px;
+  margin: 0 0.6rem;
+  vertical-align: middle;
+  background: var(--hec-accent);
+}
+
+/* ---------- generated icon set (glow lines on black, screen-blended) ---------- */
+
+.hec-icon {
+  display: block;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 6px rgba(255, 46, 20, 0.35));
+}
+
+.hec-ledger__row {
+  grid-template-columns: 9rem 1fr;
+}
+
+.hec-ledger__row dt {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.7rem;
+  row-gap: 0.1rem;
+  align-items: center;
+}
+
+.hec-ledger__row dt .hec-icon {
+  grid-row: 1 / span 2;
+}
+
+.hec-readouts li {
+  grid-template-columns: 28px auto 1fr;
+  align-items: center;
+}

@@ -1,0 +1,22 @@
+board-statement ["8b97e994-e8e4-4abe-8e4e-59155d1abd38"]
+board-ledger ["32d02d9e-0892-4972-a8ff-5dd484bf3030"]
+board-readouts ["e70d8e63-c749-4486-8536-334a8b98bc95"]
+board-reels ["08a1b608-6884-463f-a61c-f871a4140897"]
+ring 97c31717-1f9d-4703-9703-5b598092108c
+plate-embers addfa190-590f-409b-bcd6-a633e8d7641e
+icons c3efc53d-c4c6-4a87-90ec-d57b852447a9
+cover-a 5198fc1f-8e7d-4aa0-8c20-aaf9b9e0c8c8
+cover-b f8e23f1c-195f-4d62-bfba-456a21f43b32
+storyboard 81711083-9f21-4a5d-a08d-e63e295e8ed6
+plate-ring FAILED
+board-hero FAILED
+board-band FAILED
+plate-ring e0060c67-5b16-4814-8bfb-5908fd164519
+board-hero 3aa66516-62f8-44bd-8f36-1a20da251da3
+board-band f68673b9-1174-4793-80a4-c071d017265a
+plate-embers 2f9c3c34-bf73-49c1-9af6-44b69527d92b
+film 
+film 
+cover-cutout 64482b11-1e54-4d8a-9e88-d4295c903ef6
+film 7c45a112-8f64-423d-b900-da11e50160b3
+logo-fallback 9de638c2-b6c8-4949-816d-835e59b3b4de

@@ -1,8 +1,8 @@
 {
   "og_title": "HEC",
   "og_description": "High Energy Circle: Studenten-Community in Dresden mit vier festen Terminen pro Woche. Ziele, Sport, Autos, Nächte. Rein über WhatsApp.",
-  "og_image_url": null,
+  "og_image_url": "/og/hec-og.png",
   "favicon_url": "/icons/icon-192.png",
   "og_video_url": null,
-  "marketplace_cover_url": null
+  "marketplace_cover_url": "/og/hec-cover.png"
 }
