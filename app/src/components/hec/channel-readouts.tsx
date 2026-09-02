@@ -9,7 +9,7 @@ export function ChannelReadouts() {
         <li key={channel.label}>
           <img
             className="hec-icon"
-            src={`/assets/icons/${channel.icon}.png`}
+            src={`/assets/icons/${channel.icon}.webp`}
             alt=""
             width={28}
             height={28}

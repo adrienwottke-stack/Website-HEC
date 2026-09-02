@@ -15,7 +15,7 @@ export function AgendaLedger() {
             <dt>
               <img
                 className="hec-icon"
-                src={`/assets/icons/${row.icon}.png`}
+                src={`/assets/icons/${row.icon}.webp`}
                 alt=""
                 width={28}
                 height={28}

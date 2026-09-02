@@ -1205,3 +1205,24 @@ html[data-ignition="impact"] .hec-nav {
   grid-template-columns: 28px auto 1fr;
   align-items: center;
 }
+
+/* hero composition: on wide screens the logo sits up and right of the copy */
+@media (min-width: 861px) {
+  .hec-hero-logo {
+    transform: translate(9vw, -9vh) scale(calc(1 + var(--ss-progress, 0) * 2.4));
+  }
+
+  .hec-hero-logo img {
+    width: min(48vw, 36rem);
+  }
+
+  .hec-journey #ignition .scroll-scrub__copy::before {
+    inset: -3rem -4rem;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--hec-ground) 78%, transparent) 0%,
+      color-mix(in srgb, var(--hec-ground) 45%, transparent) 55%,
+      transparent 78%
+    );
+  }
+}
