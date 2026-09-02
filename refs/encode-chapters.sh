@@ -4,7 +4,7 @@
 # variants, and extract the exact first-frame posters from the ENCODED clips.
 #
 # Usage: bash refs/encode-chapters.sh refs/film/source.mp4
-# Output: app/public/assets/world/<chapter>{,-mobile}.mp4 + *-poster.png
+# Output: app/public/assets/world/<chapter>{,-mobile}.mp4 + *-poster.jpg
 
 set -euo pipefail
 
@@ -35,8 +35,8 @@ for line in "${CHAPTERS[@]}"; do
     -c:v libx264 -preset slow -crf 23 -pix_fmt yuv420p \
     -g 4 -keyint_min 4 -sc_threshold 0 -movflags +faststart "$OUT/$name-mobile.mp4"
   # Posters from the encoded clips (never from the source).
-  ffmpeg -v error -y -ss 0 -i "$OUT/$name.mp4" -frames:v 1 -q:v 2 "$OUT/$name-poster.png"
-  ffmpeg -v error -y -ss 0 -i "$OUT/$name-mobile.mp4" -frames:v 1 -q:v 2 "$OUT/$name-mobile-poster.png"
+  ffmpeg -v error -y -ss 0 -i "$OUT/$name.mp4" -frames:v 1 -q:v 2 "$OUT/$name-poster.jpg"
+  ffmpeg -v error -y -ss 0 -i "$OUT/$name-mobile.mp4" -frames:v 1 -q:v 2 "$OUT/$name-mobile-poster.jpg"
 done
 
 echo "== sizes =="

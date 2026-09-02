@@ -24,8 +24,8 @@ export const scrollScrubTheme: ScrollScrubTheme = {
 const world = (name: string) => ({
   clip: `/assets/world/${name}.mp4`,
   mobileClip: `/assets/world/${name}-mobile.mp4`,
-  mobilePoster: `/assets/world/${name}-mobile-poster.png`,
-  poster: `/assets/world/${name}-poster.png`,
+  mobilePoster: `/assets/world/${name}-mobile-poster.jpg`,
+  poster: `/assets/world/${name}-poster.jpg`,
 });
 
 export const scrollScrubScenes: ScrollScrubScene[] = [
