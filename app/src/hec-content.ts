@@ -19,8 +19,8 @@ export const THEME_COLOR = "#070606";
 /** The one CTA label on the whole page (one label per intent). */
 export const CTA_LABEL = "Zur WhatsApp-Gruppe";
 
-/** WhatsApp invite link of the HEC group. INPUT_PENDING until Adrien sends it. */
-export const WHATSAPP_URL = "https://chat.whatsapp.com/INPUT_PENDING";
+/** WhatsApp invite link of the HEC group. */
+export const WHATSAPP_URL = "https://chat.whatsapp.com/FH8rNBEqze3Ix5dwX9OWdv";
 
 /** Instagram profile URL. Leave empty to hide the footer link. */
 export const INSTAGRAM_URL = "";
