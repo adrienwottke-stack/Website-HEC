@@ -34,11 +34,13 @@ Defense: one accent, one ground, one theme. Everything red on the page is either
 - Readouts (days, times, channel labels, nav, tags): JetBrains Mono 400 / 500, uppercase, `letter-spacing 0.16em`. Self-hosted (OFL).
 - No serif anywhere. No Inter.
 
-## Animation mode: animated-website
+## Animation mode
+
+Animation mode: animated-website
 
 Intake answer "Beides": code intro at load PLUS the scroll film. Journey block:
 
-- **Journey shape:** `single-shot`. ONE continuous 15 s film (seedance_2_0, 16:9, 1080p, silent), generated in one call from the ring-only still and the 6-panel storyboard as generic references. Because the shipped engine assigns one clip per scene, the single take is cut frame-exact into 4 chapter segments after encoding (same source, no seams) and each chapter gets its own clip + exact-frame poster.
+- **Journey shape:** `single-shot`. ONE continuous 15 s film (MiniMax H3, 16:9, 2K, silent; Seedance 2.0 and Kling 3.0 are gated behind the Pro plan on this account), generated in one call from the 6-panel storyboard and the ring-only still as generic references. Because the shipped engine assigns one clip per scene, the single take is cut frame-exact into 4 chapter segments after encoding (same source, no seams) and each chapter gets its own clip + exact-frame poster.
 - **Journey (4 chapters, film time 0–15 s):**
   0. `ignition` "Hero" (0.00–2.25 s): almost black, a faint distant ember glow at the exact center. The logo (HTML layer, screen blend) sits over it; as scrolling starts the logo scales out and the film's ring emerges. Copy bottom-left. Focal point: center.
   1. `was-hec` "Was HEC ist" (2.25–6.75 s): the plasma ring surfaces from the dark and grows while the camera pushes in. Copy left. Focal point: the ring, center.
@@ -70,7 +72,7 @@ Nav: wordmark (ring mark + HEC), "Wochenplan" anchor, "Zur WhatsApp-Gruppe". Foo
 - User asset (wins, never regenerated): the HEC logo → `app/public/assets/logo/hec-logo.png` + `.webp`, plus the head kit derived from it (favicon.svg = red ring on ground; PNG 16/32/180/192/512 + maskable 512; `site.webmanifest`; theme-color `#070606`).
 - Ring-only still (nano_banana_pro, logo as reference, empty center): film reference, storyboard reference, final-band plate.
 - Storyboard: one 16:9 6-panel grid of the single continuous move.
-- Film: one 15 s seedance_2_0 take → 4 chapter segments, desktop + mobile encodes, exact-frame posters, all under `app/public/assets/world/`.
+- Film: one 15 s MiniMax H3 take (2K) → 4 chapter segments, desktop + mobile encodes, exact-frame posters, all under `app/public/assets/world/`.
 - Section plates (2): dark ember field (reels section), calm ring interior (fallback plate).
 - Icon set: one sheet, 6 glow-line glyphs on pure black (bolt, ring, dumbbell, car, sunrise, speech bubble), sliced with Pillow, composited with `mix-blend-mode: screen` (no background removal needed on a black page).
 - Cover + OG: nano_banana_pro 3:2 scene (students on a Dresden riverside lot at night around a floating plasma ring), cutout via image_background_remover, composed with compose_cover.py, title "HEC", frame signal-red.

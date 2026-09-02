@@ -104,6 +104,7 @@ function buildHead(meta: AppMeta) {
       { rel: "icon", href: favicon },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/icons/favicon-32.png" },
+      { rel: "icon", type: "image/png", sizes: "16x16", href: "/icons/favicon-16.png" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/icons/apple-touch-icon.png" },
       { rel: "manifest", href: "/site.webmanifest" },
       {

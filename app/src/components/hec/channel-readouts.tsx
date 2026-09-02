@@ -13,7 +13,6 @@ export function ChannelReadouts() {
             alt=""
             width={28}
             height={28}
-            loading="lazy"
             decoding="async"
           />
           <span className="hec-readouts__label">{channel.label}</span>
