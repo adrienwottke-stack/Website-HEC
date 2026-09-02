@@ -10,6 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import hecCss from "../hec.css?url";
 import { reportHiggsfieldError } from "../lib/higgsfield-error-reporting";
 // Page metadata (browser <title>/favicon + social og: tags) committed into the
 // repo and read at BUILD time. Editing it via the app settings UI rewrites this
@@ -99,6 +100,7 @@ function buildHead(meta: AppMeta) {
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: hecCss },
       { rel: "icon", href: favicon },
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/icons/favicon-32.png" },
@@ -171,7 +173,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="de" data-theme="default-dark" style={{ colorScheme: "dark" }}>
+    <html
+      lang="de"
+      data-theme="default-dark"
+      style={{ colorScheme: "dark" }}
+      // The inline head script arms data-ignition before hydration on purpose.
+      suppressHydrationWarning
+    >
       <head>
         <HeadContent />
       </head>

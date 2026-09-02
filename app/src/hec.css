@@ -216,6 +216,15 @@ html[data-ignition="done"] .hec-veil {
   padding-bottom: clamp(4.5rem, 10vh, 7.5rem);
 }
 
+.hec-journey #ignition .scroll-scrub__copy {
+  width: min(46rem, 58vw);
+}
+
+.hec-journey #ignition .scroll-scrub__title {
+  max-width: 18ch;
+  font-size: clamp(2.4rem, 5.4vw, 5.6rem);
+}
+
 /* logo layer inside the sticky stage, driven by the engine's --ss-progress */
 .hec-hero-logo {
   position: absolute;
@@ -1082,5 +1091,31 @@ html[data-ignition="impact"] .hec-nav {
   .hec-orbit__trace,
   .hec-nav__link::after {
     transition: none !important;
+  }
+}
+
+/* ---------- mobile refinements ---------- */
+
+.hec-viewfinder {
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .hec-journey #ignition .scroll-scrub__title {
+    font-size: clamp(2rem, 9.6vw, 2.7rem);
+  }
+
+  .hec-hero-logo img {
+    width: min(72vw, 34rem);
+  }
+
+  /* chapter route is desktop chrome; the progress bar stays */
+  .hec-journey .scroll-scrub__route {
+    display: none;
+  }
+
+  .hec-viewfinder {
+    font-size: 0.95rem;
+    padding: 0.95rem 1.4rem;
   }
 }
