@@ -1,8 +1,9 @@
 /**
- * Scene data for the HEC journey: ONE continuous 15 s film, cut frame-exact
- * into four chapter segments (same take, no seams). Every poster is the exact
- * first frame of the encoded clip beside it. Keep this array a module
- * constant: changing its identity rebuilds the media controller.
+ * Scene data for the HEC journey: one seam-locked film chain (the ring, the
+ * meteor flight past four stations, the atmosphere entry, the impact), cut
+ * into five chapter segments. Every poster is the exact first frame of the
+ * encoded clip beside it. Keep this array a module constant: changing its
+ * identity rebuilds the media controller.
  */
 import type {
   ScrollScrubScene,
@@ -11,6 +12,7 @@ import type {
 import { AgendaLedger } from "@/components/hec/agenda-ledger";
 import { ChannelReadouts } from "@/components/hec/channel-readouts";
 import { HeroCta } from "@/components/hec/hero-cta";
+import { ImpactCta } from "@/components/hec/impact-cta";
 import { OrbitLink } from "@/components/hec/orbit-link";
 import { CTA_LABEL, WHATSAPP_URL } from "@/hec-content";
 
@@ -50,19 +52,19 @@ export const scrollScrubScenes: ScrollScrubScene[] = [
     scroll: 1.4,
   },
   {
-    ...world("wochenplan"),
+    ...world("stationen"),
     id: "wochenplan",
     label: "Woche",
     kicker: "Jede Woche",
     title: "Vier Termine. Jede Woche.",
-    body: "Vier Abende, die im Kalender stehen. Du entscheidest, ob du da bist.",
+    body: "Vier Stationen die Woche. Du entscheidest, ob du da bist.",
     actions: <AgendaLedger />,
     align: "right",
-    scroll: 1.6,
-    linger: 0.2,
+    scroll: 1.9,
+    linger: 0.15,
   },
   {
-    ...world("gruppe"),
+    ...world("eintritt"),
     id: "gruppe",
     label: "Gruppe",
     title: "Was in der Gruppe läuft.",
@@ -74,6 +76,17 @@ export const scrollScrubScenes: ScrollScrubScene[] = [
       </>
     ),
     align: "left",
-    scroll: 1.4,
+    scroll: 1.3,
+  },
+  {
+    ...world("einschlag"),
+    id: "rein",
+    label: "Rein",
+    title: "Rein oder raus.",
+    body: "Ein Klick, dann bist du in der Gruppe. Der nächste Termin steht drin.",
+    actions: <ImpactCta href={WHATSAPP_URL}>{CTA_LABEL}</ImpactCta>,
+    align: "left",
+    scroll: 1.7,
+    linger: 0.25,
   },
 ];

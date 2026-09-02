@@ -1,22 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { FinalBand } from "@/components/hec/final-band";
-import { HeroStage } from "@/components/hec/hero-stage";
 import { IgnitionGate } from "@/components/hec/ignition/ignition-gate";
+import { Journey } from "@/components/hec/journey";
 import { ReelsStrip } from "@/components/hec/reels-strip";
 import { SiteFooter } from "@/components/hec/site-footer";
 import { SiteNav } from "@/components/hec/site-nav";
 import { StructuredData } from "@/components/hec/structured-data";
-import { ScrollScrub } from "@/components/scroll-scrub/scroll-scrub";
-import {
-  INSTAGRAM_URL,
-  REELS,
-  SITE_DESCRIPTION,
-  SITE_NAME,
-  SITE_URL,
-  WHATSAPP_URL,
-} from "@/hec-content";
-import { scrollScrubScenes, scrollScrubTheme } from "@/scroll-scrub-scenes";
+import { INSTAGRAM_URL, REELS, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/hec-content";
 
 const SCHEMA = JSON.stringify({
   "@context": "https://schema.org",
@@ -54,7 +44,8 @@ export const Route = createFileRoute("/")({
 
 // The whole page IS the journey: the scrub controller owns media time while
 // every chapter stays server-rendered in semantic flow. The ignition intro is
-// a load-time canvas overlay that never touches the video elements.
+// a load-time canvas overlay that never touches the video elements; the
+// meteor's impact is the final chapter, where the join CTA lives.
 function Index() {
   return (
     <>
@@ -62,14 +53,8 @@ function Index() {
       <SiteNav />
       <main>
         <StructuredData json={SCHEMA} />
-        <ScrollScrub
-          className="hec-journey"
-          scenes={scrollScrubScenes}
-          theme={scrollScrubTheme}
-          stageChildren={<HeroStage />}
-        />
+        <Journey />
         <ReelsStrip reels={REELS} plate="/assets/plates/embers.webp" />
-        <FinalBand href={WHATSAPP_URL} plate="/assets/plates/ring.webp" />
       </main>
       <SiteFooter />
     </>

@@ -40,7 +40,7 @@ Animation mode: animated-website
 
 Intake answer "Beides": code intro at load PLUS the scroll film. Journey block:
 
-- **Journey shape:** `single-shot`. ONE continuous 15 s film (MiniMax H3, 16:9, 2K, silent; Seedance 2.0 and Kling 3.0 are gated behind the Pro plan on this account), generated in one call from the 6-panel storyboard and the ring-only still as generic references. Because the shipped engine assigns one clip per scene, the single take is cut frame-exact into 4 chapter segments after encoding (same source, no seams) and each chapter gets its own clip + exact-frame poster.
+- **Journey shape:** `multi-leg` (updated 2026-09-02 late, on Adrien's request for a meteor story with stations and an impact at the CTA). ONE continuous 15 s film (MiniMax H3, 16:9, 2K, silent; Seedance 2.0 and Kling 3.0 are gated behind the Pro plan on this account), generated in one call from the 6-panel storyboard and the ring-only still as generic references. Because the shipped engine assigns one clip per scene, the single take is cut frame-exact into 4 chapter segments after encoding (same source, no seams) and each chapter gets its own clip + exact-frame poster.
 - **Journey (4 chapters, film time 0–15 s):**
   0. `ignition` "Hero" (0.00–2.25 s): almost black, a faint distant ember glow at the exact center. The logo (HTML layer, screen blend) sits over it; as scrolling starts the logo scales out and the film's ring emerges. Copy bottom-left. Focal point: center.
   1. `was-hec` "Was HEC ist" (2.25–6.75 s): the plasma ring surfaces from the dark and grows while the camera pushes in. Copy left. Focal point: the ring, center.
@@ -105,3 +105,14 @@ Nav: wordmark (ring mark + HEC), "Wochenplan" anchor, "Zur WhatsApp-Gruppe". Foo
 - Reels (eyebrow Aus den Treffen): So sieht das aus.
 - Final: Rein oder raus. / Ein Klick, dann bist du in der Gruppe. Der nächste Termin steht drin.
 - Meta: title "HEC. High Energy Circle Dresden"; og_title "HEC"; description "High Energy Circle: Studenten-Community in Dresden mit vier festen Terminen pro Woche. Ziele, Sport, Autos, Nächte. Rein über WhatsApp."
+
+## Journey update (2026-09-02 late): the meteor story
+
+Adrien asked for the scroll to tell a story with rising energy: a meteor that flies past stations and finally hits, and the hit is where the join CTA lives. The ring film stays as act 1; two seam-locked legs (MiniMax H3, 15 s each, each started on the previous leg's actual last frame via `--start-image`) extend it:
+
+- **Leg 2 "stations":** from inside the ring a meteor ignites and shoots into deep space, the camera behind it; it passes four glowing waypoints, each closer and more violent than the last (the four weekly events are the four stations).
+- **Leg 3 "entry + impact":** the meteor dives toward a dark planet, the atmosphere burns, the ground rushes up, IMPACT: flash, shockwave, embers, and the fire settles into one calm ring of plasma on the dark ground, the crater that is the HEC circle.
+
+Five chapters (`refs/encode-chapters.sh`): `ignition` (act 1, 0 to 6.75 s), `was-hec` (act 1, 6.75 to 15 s), `stationen` (leg 2), `eintritt` (leg 3, 0 to 7.5 s), `einschlag` (leg 3, 7.5 to 15 s, the final chapter with "Rein oder raus." and the impact-plate CTA). When the impact chapter becomes active for the first time the page flashes and the stage shakes once (CSS keyframes on `html[data-impact]`, reduced-motion safe). The separate final band is gone; the impact chapter is the finale, followed by the reels section (when reel URLs exist) and the footer.
+
+Delivery budget (revised for three legs): desktop segments ≤ 32 MiB total, mobile ≤ 16 MiB (the template's ceilings). Legs 2 and 3 encode at CRF 22 desktop / 25 mobile because explosions compress badly.

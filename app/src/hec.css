@@ -1226,3 +1226,130 @@ html[data-ignition="impact"] .hec-nav {
     );
   }
 }
+
+/* ---------- impact chapter: CTA plate + page-level impact cue ---------- */
+
+.hec-impact {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.35rem 2rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 46, 20, 0.6);
+  color: var(--hec-ink);
+  font-family: var(--hec-display);
+  font-size: clamp(1.1rem, 1.6vw, 1.45rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform 480ms var(--hec-ease-out), border-color 300ms;
+}
+
+.hec-impact__plate {
+  position: absolute;
+  inset: -12%;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.85;
+  transition: transform 800ms var(--hec-ease-out), opacity 400ms, filter 400ms;
+}
+
+.hec-impact__label {
+  position: relative;
+}
+
+.hec-impact__arrow {
+  width: 28px;
+  height: 14px;
+  flex: 0 0 auto;
+  transition: transform 400ms var(--hec-ease-out);
+}
+
+.hec-impact:hover,
+.hec-impact:focus-visible {
+  transform: skewX(-3deg) scale(1.02);
+  border-color: var(--hec-heat-2);
+}
+
+.hec-impact:hover .hec-impact__plate {
+  transform: scale(1.1);
+  opacity: 1;
+  filter: saturate(1.3) brightness(1.15);
+}
+
+.hec-impact:hover .hec-impact__arrow {
+  transform: translateX(8px);
+}
+
+.hec-impact:active {
+  transform: skewX(-3deg) scale(0.98);
+}
+
+/* flash + shake when the impact chapter becomes active (once per visit) */
+.hec-impact-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: radial-gradient(
+    circle at 50% 55%,
+    rgba(255, 244, 224, 0.95) 0%,
+    rgba(255, 46, 20, 0.65) 32%,
+    transparent 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+
+html[data-impact="1"] .hec-impact-flash {
+  animation: hec-flash 900ms ease-out both;
+}
+
+html[data-impact="1"] .hec-journey .scroll-scrub__stage {
+  animation: hec-shake 700ms ease-out both;
+}
+
+@keyframes hec-flash {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes hec-shake {
+  0% {
+    transform: translate(0, 0);
+  }
+  12% {
+    transform: translate(-12px, 8px);
+  }
+  25% {
+    transform: translate(10px, -9px);
+  }
+  38% {
+    transform: translate(-8px, 6px);
+  }
+  52% {
+    transform: translate(6px, -4px);
+  }
+  70% {
+    transform: translate(-3px, 2px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-impact="1"] .hec-impact-flash,
+  html[data-impact="1"] .hec-journey .scroll-scrub__stage {
+    animation: none;
+  }
+}
