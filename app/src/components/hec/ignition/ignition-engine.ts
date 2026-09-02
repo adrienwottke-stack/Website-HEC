@@ -112,6 +112,33 @@ export function runIgnition(
   let impacted = false;
   let done = false;
   let raf = 0;
+  let guard = 0;
+
+  // Hard wall-clock cap: whatever happens to animation frames (throttled or
+  // paused tabs, embedded previews), the intro never outlives its timeline by
+  // more than a few seconds. While the tab is hidden the cap is re-armed so the
+  // sequence can still play once the visitor comes back.
+  const finish = () => {
+    if (done) return;
+    if (!impacted) {
+      impacted = true;
+      cb.onImpact?.();
+    }
+    done = true;
+    window.cancelAnimationFrame(raf);
+    cb.onDone?.();
+  };
+  const armGuard = () => {
+    guard = window.setTimeout(() => {
+      if (done) return;
+      if (document.visibilityState !== "visible") {
+        armGuard();
+        return;
+      }
+      finish();
+    }, T.fadeEnd + 3000);
+  };
+  armGuard();
 
   const unit = () => Math.min(W, H) / 900;
   const bez = (p: number) => {
@@ -347,8 +374,8 @@ export function runIgnition(
     }
 
     if (t >= T.fadeEnd) {
-      done = true;
-      cb.onDone?.();
+      window.clearTimeout(guard);
+      finish();
       return;
     }
     raf = window.requestAnimationFrame(frame);
@@ -369,6 +396,7 @@ export function runIgnition(
     },
     destroy() {
       done = true;
+      window.clearTimeout(guard);
       window.cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
       particles.length = 0;
