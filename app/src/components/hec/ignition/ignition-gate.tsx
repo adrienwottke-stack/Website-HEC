@@ -18,9 +18,14 @@ export function IgnitionGate() {
   const [play, setPlay] = useState(false);
 
   useEffect(() => {
-    if (document.documentElement.dataset.ignition === "armed") {
-      setPlay(true);
+    if (document.documentElement.dataset.ignition !== "armed") return;
+    if (document.hidden) {
+      // Opened in a background tab: animation frames are paused there, so
+      // show the finished hero instead of leaving the veil standing.
+      setIgnitionState("done");
+      return;
     }
+    setPlay(true);
   }, []);
 
   const handleImpact = useCallback(() => {

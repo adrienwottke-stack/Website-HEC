@@ -116,8 +116,7 @@ export function runIgnition(
 
   // Hard wall-clock cap: whatever happens to animation frames (throttled or
   // paused tabs, embedded previews), the intro never outlives its timeline by
-  // more than a few seconds. While the tab is hidden the cap is re-armed so the
-  // sequence can still play once the visitor comes back.
+  // more than a few seconds.
   const finish = () => {
     if (done) return;
     if (!impacted) {
@@ -128,17 +127,7 @@ export function runIgnition(
     window.cancelAnimationFrame(raf);
     cb.onDone?.();
   };
-  const armGuard = () => {
-    guard = window.setTimeout(() => {
-      if (done) return;
-      if (document.visibilityState !== "visible") {
-        armGuard();
-        return;
-      }
-      finish();
-    }, T.fadeEnd + 3000);
-  };
-  armGuard();
+  guard = window.setTimeout(finish, T.fadeEnd + 3000);
 
   const unit = () => Math.min(W, H) / 900;
   const bez = (p: number) => {
