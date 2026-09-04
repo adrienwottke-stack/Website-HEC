@@ -237,24 +237,26 @@ html[data-ignition="done"] .hec-veil {
   font-size: clamp(2.4rem, 5.4vw, 5.6rem);
 }
 
-/* logo layer inside the sticky stage, driven by the engine's --ss-progress */
+/* logo layer inside the sticky stage. It never moves or scales: it burns
+ * out between 3% and 12% of the hero chapter, while the film is still black,
+ * so the film's ring and the logo's ring are never on screen together. */
 .hec-hero-logo {
+  --hec-hero-local: calc(var(--ss-progress, 0) / var(--hec-hero-share, 0.165));
   position: absolute;
   inset: 0;
   z-index: 3;
   display: grid;
   place-items: center;
   pointer-events: none;
-  opacity: clamp(0, 1 - var(--ss-progress, 0) * 7, 1);
-  transform: scale(calc(1 + var(--ss-progress, 0) * 2.4));
-  will-change: opacity, transform;
+  opacity: clamp(0, (0.12 - var(--hec-hero-local)) / 0.09, 1);
+  will-change: opacity;
 }
 
 .hec-hero-logo img {
   width: min(64vw, 34rem);
   height: auto;
-  mix-blend-mode: screen;
-  /* no drop-shadow: the PNG is opaque, a shadow would outline its square */
+  /* hec-logo-cut.* carries real alpha (black keyed out), so no blend mode is
+   * needed; screen blending inside the faded layer showed the PNG square. */
 }
 
 html[data-ignition="impact"] .hec-hero-logo img {
@@ -1241,7 +1243,7 @@ html[data-ignition="impact"] .hec-nav {
 /* hero composition: on wide screens the logo sits up and right of the copy */
 @media (min-width: 861px) {
   .hec-hero-logo {
-    transform: translate(9vw, -9vh) scale(calc(1 + var(--ss-progress, 0) * 2.4));
+    transform: translate(9vw, -9vh);
   }
 
   .hec-hero-logo img {
@@ -1401,30 +1403,33 @@ html[data-ignition="impact"] .hec-nav {
 .hec-scrim__side--left {
   background: linear-gradient(
     to right,
-    rgba(7, 6, 6, 0.94) 0%,
-    rgba(7, 6, 6, 0.84) 28%,
-    rgba(7, 6, 6, 0.5) 50%,
-    rgba(7, 6, 6, 0) 68%
+    rgba(7, 6, 6, 0.97) 0%,
+    rgba(7, 6, 6, 0.93) 30%,
+    rgba(7, 6, 6, 0.82) 50%,
+    rgba(7, 6, 6, 0.5) 66%,
+    rgba(7, 6, 6, 0) 84%
   );
 }
 
 .hec-scrim__side--right {
   background: linear-gradient(
     to left,
-    rgba(7, 6, 6, 0.94) 0%,
-    rgba(7, 6, 6, 0.84) 28%,
-    rgba(7, 6, 6, 0.5) 50%,
-    rgba(7, 6, 6, 0) 68%
+    rgba(7, 6, 6, 0.97) 0%,
+    rgba(7, 6, 6, 0.93) 30%,
+    rgba(7, 6, 6, 0.82) 50%,
+    rgba(7, 6, 6, 0.5) 66%,
+    rgba(7, 6, 6, 0) 84%
   );
 }
 
 .hec-scrim__bottom {
   background: linear-gradient(
     to top,
-    rgba(7, 6, 6, 0.96) 0%,
-    rgba(7, 6, 6, 0.9) 38%,
-    rgba(7, 6, 6, 0.55) 62%,
-    rgba(7, 6, 6, 0) 84%
+    rgba(7, 6, 6, 0.97) 0%,
+    rgba(7, 6, 6, 0.94) 42%,
+    rgba(7, 6, 6, 0.72) 62%,
+    rgba(7, 6, 6, 0.3) 78%,
+    rgba(7, 6, 6, 0) 92%
   );
 }
 
@@ -1433,18 +1438,18 @@ html[data-ignition="impact"] .hec-nav {
   opacity: var(--hec-scrim, 1);
 }
 
-/* Copy plate: a soft-edged rectangle that covers the whole text box plus an
- * overscan, instead of a radial that runs out before the line ends. */
+/* No plate behind the copy: any rectangle reads as a box over the fire.
+ * The stage scrim carries the contrast; the text keeps a soft shadow. */
 .hec-journey .scroll-scrub__copy::before {
-  inset: -2rem -2.5rem;
-  background: color-mix(in srgb, var(--hec-ground) 62%, transparent);
-  box-shadow: 0 0 72px 44px color-mix(in srgb, var(--hec-ground) 62%, transparent);
+  display: none;
 }
 
 .hec-journey .scroll-scrub__title,
 .hec-journey .scroll-scrub__body,
 .hec-journey .scroll-scrub__kicker {
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.5),
+    0 6px 40px rgba(0, 0, 0, 0.65);
 }
 
 /* Hero-only layers: the logo has faded out before chapter 0 ends, and the
@@ -1464,11 +1469,6 @@ html[data-ignition="impact"] .hec-nav {
     opacity: 1;
   }
 
-  /* keep the plate inside the pin padding so nothing widens the page */
-  .hec-journey .scroll-scrub__copy::before {
-    inset: -1.5rem -1.1rem;
-    box-shadow: 0 0 40px 24px color-mix(in srgb, var(--hec-ground) 62%, transparent);
-  }
 }
 
 /* ---------- mobile: everything over the film must fit one screen ---------- */

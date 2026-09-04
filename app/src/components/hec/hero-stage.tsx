@@ -20,12 +20,12 @@ export function HeroStage() {
       <EmberField />
       <div className="hec-hero-logo">
         <picture>
-          <source srcSet="/assets/logo/hec-logo.webp" type="image/webp" />
+          <source srcSet="/assets/logo/hec-logo-cut.webp" type="image/webp" />
           <img
-            src="/assets/logo/hec-logo.png"
+            src="/assets/logo/hec-logo-cut.png"
             alt="HEC, High Energy Circle: roter Plasma-Ring um die Buchstaben HEC"
-            width={1024}
-            height={1024}
+            width={896}
+            height={896}
             decoding="async"
             fetchPriority="high"
           />
