@@ -43,7 +43,7 @@ export const scrollScrubScenes: HecScene[] = [
     body: "HEC ist eine Community in Dresden. Vier feste Termine pro Woche: Ziele, Sport, Autos, Nächte. Rein oder raus.",
     actions: <HeroCta href={WHATSAPP_URL}>{CTA_LABEL}</HeroCta>,
     align: "left",
-    scroll: 1.2,
+    scroll: 1.5,
     scrim: 0.55,
   },
   {
@@ -66,8 +66,8 @@ export const scrollScrubScenes: HecScene[] = [
     body: "Vier Stationen die Woche. Du entscheidest, ob du da bist.",
     actions: <AgendaLedger />,
     align: "right",
-    scroll: 1.9,
-    linger: 0.15,
+    scroll: 2.4,
+    linger: 0.1,
     scrim: 1,
   },
   {
@@ -82,8 +82,9 @@ export const scrollScrubScenes: HecScene[] = [
         <OrbitLink href={WHATSAPP_URL}>{CTA_LABEL}</OrbitLink>
       </>
     ),
-    align: "left",
-    scroll: 1.3,
+    align: "right",
+    mobileObjectPosition: "100% 50%",
+    scroll: 1.8,
     scrim: 1,
   },
   {
@@ -94,8 +95,7 @@ export const scrollScrubScenes: HecScene[] = [
     body: "Ein Klick, dann bist du in der Gruppe. Der nächste Termin steht drin.",
     actions: <ImpactCta href={WHATSAPP_URL}>{CTA_LABEL}</ImpactCta>,
     align: "left",
-    scroll: 1.7,
-    linger: 0.25,
+    scroll: 2.0,
     scrim: 0.85,
   },
 ];

@@ -302,14 +302,20 @@ html[data-ignition="impact"] .hec-journey #ignition .scroll-scrub__copy {
 .hec-nav::before {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 0 0 -56px;
   z-index: -1;
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--hec-ground) 85%, transparent),
-    transparent
+    color-mix(in srgb, var(--hec-ground) 92%, transparent) 0%,
+    color-mix(in srgb, var(--hec-ground) 78%, transparent) 42%,
+    transparent 100%
   );
   pointer-events: none;
+}
+
+.hec-nav__mark,
+.hec-nav__link {
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.7);
 }
 
 html[data-ignition="armed"] .hec-nav {
@@ -1432,7 +1438,7 @@ html[data-ignition="impact"] .hec-nav {
 .hec-journey .scroll-scrub__copy::before {
   inset: -2rem -2.5rem;
   background: color-mix(in srgb, var(--hec-ground) 62%, transparent);
-  box-shadow: 0 0 56px 40px color-mix(in srgb, var(--hec-ground) 62%, transparent);
+  box-shadow: 0 0 72px 44px color-mix(in srgb, var(--hec-ground) 62%, transparent);
 }
 
 .hec-journey .scroll-scrub__title,
@@ -1462,5 +1468,54 @@ html[data-ignition="impact"] .hec-nav {
   .hec-journey .scroll-scrub__copy::before {
     inset: -1.5rem -1.1rem;
     box-shadow: 0 0 40px 24px color-mix(in srgb, var(--hec-ground) 62%, transparent);
+  }
+}
+
+/* ---------- mobile: everything over the film must fit one screen ---------- */
+
+@media (max-width: 860px) {
+  /* the engine's own mobile title rule loses to .hec-journey's specificity */
+  .hec-journey .scroll-scrub__title {
+    max-width: 12ch;
+    font-size: clamp(2.2rem, 9.6vw, 2.7rem);
+  }
+
+  /* the off-grid offsets are desktop decoration; on a 335px column they cost
+   * a tenth of the line and push the values against the edge */
+  .hec-readouts li:nth-child(even),
+  .hec-readouts li:nth-child(3) {
+    transform: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .hec-ledger__numeral {
+    display: none;
+  }
+
+  /* one column: icon, day and time on a line, the name and text below */
+  .hec-ledger__row {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+    padding: 0.5rem 0;
+  }
+
+  .hec-ledger__row dt {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .hec-ledger__row dt .hec-icon {
+    grid-row: auto;
+    width: 24px;
+    height: 24px;
+  }
+
+  .hec-ledger__row dd span {
+    margin-top: 0.1rem;
+    font-size: 0.95rem;
+    line-height: 1.35;
   }
 }

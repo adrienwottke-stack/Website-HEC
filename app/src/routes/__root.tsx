@@ -121,6 +121,22 @@ function buildHead(meta: AppMeta) {
         type: "font/woff2",
         crossOrigin: "anonymous" as const,
       },
+      // The mono face carries every label, tag and readout; without a preload
+      // it is discovered after CSSOM and all of them swap mid-load.
+      {
+        rel: "preload",
+        href: "/fonts/JetBrainsMono-Regular.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous" as const,
+      },
+      {
+        rel: "preload",
+        href: "/fonts/JetBrainsMono-Medium.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous" as const,
+      },
     ],
     scripts: [{ children: ARM_IGNITION_SCRIPT }],
   };
