@@ -36,6 +36,8 @@
   --hec-ground: #070606;
   --hec-ink: #f5efe8;
   --hec-muted: #9a8f88;
+  /* secondary text over the film; --hec-muted stays for on-ground surfaces */
+  --hec-ink-2: #d8cfc7;
   --hec-accent: #ff2e14;
   --hec-line: #2a1f1c;
   --hec-heat-1: #ff7a1a;
@@ -59,7 +61,6 @@ body {
   font-family: var(--hec-display);
   font-weight: 500;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
 }
 
 ::selection {
@@ -165,7 +166,7 @@ html[data-ignition="done"] .hec-veil {
 
 .hec-journey .scroll-scrub__kicker {
   font-family: var(--hec-mono);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 500;
   letter-spacing: 0.18em;
   color: var(--hec-accent);
@@ -175,34 +176,45 @@ html[data-ignition="done"] .hec-veil {
   border-color: var(--hec-line);
   border-radius: 0;
   font-family: var(--hec-mono);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--hec-muted);
+  color: var(--hec-ink-2);
 }
 
 .hec-journey .scroll-scrub__progress span {
   background: linear-gradient(90deg, var(--hec-accent), var(--hec-heat-2));
 }
 
+/* chapter route: bottom centre, where no chapter puts copy, on its own plate */
 .hec-journey .scroll-scrub__route {
   top: auto;
-  right: var(--hec-gutter);
-  bottom: calc(1.25rem + env(safe-area-inset-bottom));
-  left: auto;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0;
+  right: auto;
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: row;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid var(--hec-line);
+  background: color-mix(in srgb, var(--hec-ground) 74%, transparent);
 }
 
 .hec-journey .scroll-scrub__route-button {
   min-height: 0;
-  padding: 0.35rem 0;
+  padding: 0.45rem 0.65rem;
   font-family: var(--hec-mono);
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--hec-muted);
+  color: var(--hec-ink-2);
+}
+
+@media (max-height: 640px) {
+  .hec-journey .scroll-scrub__route {
+    display: none;
+  }
 }
 
 .hec-journey .scroll-scrub__route-button[aria-current="step"] {
@@ -229,7 +241,7 @@ html[data-ignition="done"] .hec-veil {
 .hec-hero-logo {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 3;
   display: grid;
   place-items: center;
   pointer-events: none;
@@ -252,10 +264,9 @@ html[data-ignition="impact"] .hec-hero-logo img {
 .hec-embers {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   width: 100%;
   height: 100%;
-  mix-blend-mode: screen;
   pointer-events: none;
 }
 
@@ -285,6 +296,20 @@ html[data-ignition="impact"] .hec-journey #ignition .scroll-scrub__copy {
 
 .hec-nav > * {
   pointer-events: auto;
+}
+
+/* a static top scrim so the nav stays readable over the brightest frames */
+.hec-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--hec-ground) 85%, transparent),
+    transparent
+  );
+  pointer-events: none;
 }
 
 html[data-ignition="armed"] .hec-nav {
@@ -325,7 +350,7 @@ html[data-ignition="impact"] .hec-nav {
   position: relative;
   padding: 0.5rem 0;
   font-family: var(--hec-mono);
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -460,7 +485,7 @@ html[data-ignition="impact"] .hec-nav {
   align-items: center;
   gap: 0.9rem;
   font-family: var(--hec-mono);
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -573,7 +598,7 @@ html[data-ignition="impact"] .hec-nav {
   flex-direction: column;
   gap: 0.15rem;
   font-family: var(--hec-mono);
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -584,7 +609,7 @@ html[data-ignition="impact"] .hec-nav {
 }
 
 .hec-ledger__time {
-  color: var(--hec-muted);
+  color: var(--hec-ink-2);
 }
 
 .hec-ledger__row dd {
@@ -604,8 +629,9 @@ html[data-ignition="impact"] .hec-nav {
 .hec-ledger__row dd span {
   display: block;
   margin-top: 0.15rem;
-  font-size: 0.92rem;
-  color: var(--hec-muted);
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--hec-ink-2);
 }
 
 /* second-read moment: one oversized outlined numeral behind the ledger */
@@ -642,7 +668,7 @@ html[data-ignition="impact"] .hec-nav {
   gap: 0.8rem;
   align-items: baseline;
   font-family: var(--hec-mono);
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -1215,16 +1241,6 @@ html[data-ignition="impact"] .hec-nav {
   .hec-hero-logo img {
     width: min(48vw, 36rem);
   }
-
-  .hec-journey #ignition .scroll-scrub__copy::before {
-    inset: -3rem -4rem;
-    background: radial-gradient(
-      ellipse at center,
-      color-mix(in srgb, var(--hec-ground) 78%, transparent) 0%,
-      color-mix(in srgb, var(--hec-ground) 45%, transparent) 55%,
-      transparent 78%
-    );
-  }
 }
 
 /* ---------- impact chapter: CTA plate + page-level impact cue ---------- */
@@ -1291,11 +1307,13 @@ html[data-ignition="impact"] .hec-nav {
   transform: skewX(-3deg) scale(0.98);
 }
 
-/* flash + shake when the impact chapter becomes active (once per visit) */
+/* flash + shake when the impact chapter becomes active (once per visit).
+ * The flash is a stage layer: it sits over the film and under the copy, so
+ * "Rein oder raus." stays readable through the hit. */
 .hec-impact-flash {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  z-index: 40;
+  z-index: 4;
   background: radial-gradient(
     circle at 50% 55%,
     rgba(255, 244, 224, 0.95) 0%,
@@ -1306,11 +1324,11 @@ html[data-ignition="impact"] .hec-nav {
   pointer-events: none;
 }
 
-html[data-impact="1"] .hec-impact-flash {
+.hec-journey-wrap[data-impact="1"] .hec-impact-flash {
   animation: hec-flash 900ms ease-out both;
 }
 
-html[data-impact="1"] .hec-journey .scroll-scrub__stage {
+.hec-journey-wrap[data-impact="1"] .scroll-scrub__media {
   animation: hec-shake 700ms ease-out both;
 }
 
@@ -1348,8 +1366,101 @@ html[data-impact="1"] .hec-journey .scroll-scrub__stage {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html[data-impact="1"] .hec-impact-flash,
-  html[data-impact="1"] .hec-journey .scroll-scrub__stage {
+  .hec-journey-wrap[data-impact="1"] .hec-impact-flash,
+  .hec-journey-wrap[data-impact="1"] .scroll-scrub__media {
     animation: none;
+  }
+}
+
+/* ---------- readability over the film ---------- */
+
+/* Stage scrim: darkens the side of the frame the active chapter's copy sits
+ * on. Static gradients, only opacity changes (per chapter, via the wrapper's
+ * data-copy-side + --hec-scrim set in journey.tsx), so it never repaints. */
+.hec-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hec-scrim__side,
+.hec-scrim__bottom {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 420ms var(--hec-ease-out);
+}
+
+.hec-scrim__side--left {
+  background: linear-gradient(
+    to right,
+    rgba(7, 6, 6, 0.94) 0%,
+    rgba(7, 6, 6, 0.84) 28%,
+    rgba(7, 6, 6, 0.5) 50%,
+    rgba(7, 6, 6, 0) 68%
+  );
+}
+
+.hec-scrim__side--right {
+  background: linear-gradient(
+    to left,
+    rgba(7, 6, 6, 0.94) 0%,
+    rgba(7, 6, 6, 0.84) 28%,
+    rgba(7, 6, 6, 0.5) 50%,
+    rgba(7, 6, 6, 0) 68%
+  );
+}
+
+.hec-scrim__bottom {
+  background: linear-gradient(
+    to top,
+    rgba(7, 6, 6, 0.96) 0%,
+    rgba(7, 6, 6, 0.9) 38%,
+    rgba(7, 6, 6, 0.55) 62%,
+    rgba(7, 6, 6, 0) 84%
+  );
+}
+
+.hec-journey-wrap[data-copy-side="left"] .hec-scrim__side--left,
+.hec-journey-wrap[data-copy-side="right"] .hec-scrim__side--right {
+  opacity: var(--hec-scrim, 1);
+}
+
+/* Copy plate: a soft-edged rectangle that covers the whole text box plus an
+ * overscan, instead of a radial that runs out before the line ends. */
+.hec-journey .scroll-scrub__copy::before {
+  inset: -2rem -2.5rem;
+  background: color-mix(in srgb, var(--hec-ground) 62%, transparent);
+  box-shadow: 0 0 56px 40px color-mix(in srgb, var(--hec-ground) 62%, transparent);
+}
+
+.hec-journey .scroll-scrub__title,
+.hec-journey .scroll-scrub__body,
+.hec-journey .scroll-scrub__kicker {
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
+}
+
+/* Hero-only layers: the logo has faded out before chapter 0 ends, and the
+ * ember loop pauses itself (IntersectionObserver) once its canvas is hidden. */
+.hec-journey[data-active-section]:not([data-active-section="0"]) .hec-hero-logo,
+.hec-journey[data-active-section]:not([data-active-section="0"]) .hec-embers {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .hec-scrim__side {
+    display: none;
+  }
+
+  /* copy is bottom-anchored on phones: one permanent bottom scrim */
+  .hec-scrim__bottom {
+    opacity: 1;
+  }
+
+  /* keep the plate inside the pin padding so nothing widens the page */
+  .hec-journey .scroll-scrub__copy::before {
+    inset: -1.5rem -1.1rem;
+    box-shadow: 0 0 40px 24px color-mix(in srgb, var(--hec-ground) 62%, transparent);
   }
 }

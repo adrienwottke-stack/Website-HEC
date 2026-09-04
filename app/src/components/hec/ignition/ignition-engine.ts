@@ -431,13 +431,28 @@ export function runEmberField(canvas: HTMLCanvasElement, mobile: boolean): Ember
   let pointerY = -1;
   let lastScroll = 0;
   let scrollPush = 0;
+  // Cached canvas origin for pointer math: reading getBoundingClientRect on
+  // every pointermove forces a synchronous layout while the page scrolls.
+  let originX = 0;
+  let originY = 0;
+  let lastWidth = 0;
+  const coarse = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   const resize = () => {
     const rect = canvas.parentElement?.getBoundingClientRect();
     W = Math.max(1, Math.round(rect?.width ?? window.innerWidth));
     H = Math.max(1, Math.round(rect?.height ?? window.innerHeight));
+    originX = rect?.left ?? 0;
+    originY = rect?.top ?? 0;
+    lastWidth = window.innerWidth;
     canvas.width = W;
     canvas.height = H;
+  };
+  // Mobile URL bars fire resize continuously while scrolling; only a real
+  // width change reallocates the backing store.
+  const onResize = () => {
+    if (coarse && window.innerWidth === lastWidth) return;
+    resize();
   };
 
   const seed = (e: Ember, fromBottom: boolean) => {
@@ -460,9 +475,8 @@ export function runEmberField(canvas: HTMLCanvasElement, mobile: boolean): Ember
   lastScroll = window.scrollY;
 
   const onPointer = (ev: PointerEvent) => {
-    const rect = canvas.getBoundingClientRect();
-    pointerX = ev.clientX - rect.left;
-    pointerY = ev.clientY - rect.top;
+    pointerX = ev.clientX - originX;
+    pointerY = ev.clientY - originY;
   };
   const onLeave = () => {
     pointerX = -1;
@@ -530,7 +544,7 @@ export function runEmberField(canvas: HTMLCanvasElement, mobile: boolean): Ember
     raf = window.requestAnimationFrame(frame);
   };
 
-  window.addEventListener("resize", resize);
+  window.addEventListener("resize", onResize);
   window.addEventListener("pointermove", onPointer, { passive: true });
   window.addEventListener("pointerleave", onLeave);
   document.addEventListener("visibilitychange", onVisibility);
@@ -542,7 +556,7 @@ export function runEmberField(canvas: HTMLCanvasElement, mobile: boolean): Ember
       if (raf) window.cancelAnimationFrame(raf);
       raf = 0;
       observer?.disconnect();
-      window.removeEventListener("resize", resize);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointer);
       window.removeEventListener("pointerleave", onLeave);
       document.removeEventListener("visibilitychange", onVisibility);

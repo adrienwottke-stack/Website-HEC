@@ -16,6 +16,10 @@ import { ImpactCta } from "@/components/hec/impact-cta";
 import { OrbitLink } from "@/components/hec/orbit-link";
 import { CTA_LABEL, WHATSAPP_URL } from "@/hec-content";
 
+/** HEC scene: the engine's scene plus how hard the stage scrim darkens the
+ * copy side of the frame (0..1). Read by journey.tsx, not by the engine. */
+export type HecScene = ScrollScrubScene & { scrim: number };
+
 export const scrollScrubTheme: ScrollScrubTheme = {
   accent: "#ff2e14",
   background: "#070606",
@@ -30,7 +34,7 @@ const world = (name: string) => ({
   poster: `/assets/world/${name}-poster.jpg`,
 });
 
-export const scrollScrubScenes: ScrollScrubScene[] = [
+export const scrollScrubScenes: HecScene[] = [
   {
     ...world("ignition"),
     id: "ignition",
@@ -40,6 +44,7 @@ export const scrollScrubScenes: ScrollScrubScene[] = [
     actions: <HeroCta href={WHATSAPP_URL}>{CTA_LABEL}</HeroCta>,
     align: "left",
     scroll: 1.2,
+    scrim: 0.55,
   },
   {
     ...world("was-hec"),
@@ -50,6 +55,7 @@ export const scrollScrubScenes: ScrollScrubScene[] = [
     tags: ["Dresden", "High Energy Circle"],
     align: "left",
     scroll: 1.4,
+    scrim: 0.7,
   },
   {
     ...world("stationen"),
@@ -62,6 +68,7 @@ export const scrollScrubScenes: ScrollScrubScene[] = [
     align: "right",
     scroll: 1.9,
     linger: 0.15,
+    scrim: 1,
   },
   {
     ...world("eintritt"),
@@ -77,6 +84,7 @@ export const scrollScrubScenes: ScrollScrubScene[] = [
     ),
     align: "left",
     scroll: 1.3,
+    scrim: 1,
   },
   {
     ...world("einschlag"),
@@ -88,5 +96,6 @@ export const scrollScrubScenes: ScrollScrubScene[] = [
     align: "left",
     scroll: 1.7,
     linger: 0.25,
+    scrim: 0.85,
   },
 ];

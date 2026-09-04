@@ -87,6 +87,14 @@ interface RuntimeSegment extends Segment {
   video?: HTMLVideoElement;
   objectUrl?: string;
   abort?: AbortController;
+  /** Last media time requested from the decoder (independent of how the
+   * engine snaps currentTime to a frame), so a settled frame is never
+   * re-seeked. */
+  seekTime?: number;
+  /** Last values written to the layer; identical frames skip the CSSOM writes. */
+  styleOpacity?: string;
+  styleZ?: string;
+  styleVisible?: boolean;
 }
 
 interface Controller {
@@ -235,9 +243,17 @@ export function ScrollScrub({
       visible: index === 0,
     }));
 
+    // --ss-progress is consumed only inside the sticky stage (progress bar,
+    // hero layers). Writing it there instead of on the section root keeps the
+    // per-frame style invalidation away from the chapter copy subtree.
+    const stage =
+      root.querySelector<HTMLElement>(".scroll-scrub__stage") ?? root;
+    let lastProgress = "";
     let active = -1;
     let destroyed = false;
     let dirty = true;
+    let settled = false;
+    let lastTick = 0;
     let frame = 0;
     let rootTop = 0;
     let total = 1;
@@ -255,6 +271,7 @@ export function ScrollScrub({
       delete segment.video;
       delete segment.objectUrl;
       delete segment.loadedSource;
+      delete segment.seekTime;
       segment.loading = false;
       segment.ready = false;
       segment.failed = false;
@@ -440,10 +457,25 @@ export function ScrollScrub({
         }
 
         segment.visible = opacity > 0.001;
-        segment.layer.style.opacity = String(opacity);
-        segment.layer.style.zIndex = index === currentIndex ? "2" : "1";
+        const opacityValue = opacity.toFixed(4);
+        if (segment.styleOpacity !== opacityValue) {
+          segment.styleOpacity = opacityValue;
+          segment.layer.style.opacity = opacityValue;
+        }
+        const zValue = index === currentIndex ? "2" : "1";
+        if (segment.styleZ !== zValue) {
+          segment.styleZ = zValue;
+          segment.layer.style.zIndex = zValue;
+        }
+        if (segment.styleVisible !== segment.visible) {
+          segment.styleVisible = segment.visible;
+          segment.layer.dataset.visible = segment.visible ? "true" : "false";
+        }
 
         if (
+          !segment.loading &&
+          !segment.ready &&
+          !segment.failed &&
           y > segment.start - 1.5 * viewportHeight &&
           y < segment.end + 1.5 * viewportHeight
         ) {
@@ -466,45 +498,78 @@ export function ScrollScrub({
         onActiveRef.current?.(active);
       }
 
-      root.style.setProperty("--ss-progress", String(clamp(y / total)));
+      const progress = clamp(y / total).toFixed(4);
+      if (progress !== lastProgress) {
+        lastProgress = progress;
+        stage.style.setProperty("--ss-progress", progress);
+      }
     };
 
-    const updateVideos = () => {
+    // Half a frame at 24 fps. Anything smaller re-seeks the frame that is
+    // already on screen, and every seek is a full decode from the keyframe.
+    const SEEK_EPSILON = 0.021;
+
+    // Returns true while any clip is still converging or seeking, so the
+    // frame loop can go idle once the film has settled on the scroll target.
+    const updateVideos = (dt: number) => {
+      // Exponential approach with a 75 ms time constant: the same feel as the
+      // old 0.2-per-frame lerp at 60 Hz, but identical on 120 Hz displays.
+      const k = 1 - Math.exp(-dt / 75);
+      let busy = false;
+
       for (const segment of runtime) {
         const { video } = segment;
-        if (!video || !segment.ready || video.seeking) {
-          continue;
-        }
-        if (
-          !segment.visible &&
-          Math.abs(segment.current - segment.target) < 0.002
-        ) {
+        if (!video || !segment.ready) {
           continue;
         }
 
-        segment.current += (segment.target - segment.current) * 0.2;
+        const delta = segment.target - segment.current;
+        if (Math.abs(delta) < 0.0005) {
+          segment.current = segment.target;
+          if (!segment.visible) {
+            continue;
+          }
+        } else {
+          segment.current += delta * k;
+          busy = true;
+        }
+
+        if (video.seeking) {
+          busy = true;
+          continue;
+        }
+
         const targetTime =
           clamp(segment.current, 0, 0.999) * (video.duration || 1);
-        const epsilon = isMobile() ? 0.02 : 0.008;
-        if (Math.abs(video.currentTime - targetTime) > epsilon) {
+        const lastSeek = segment.seekTime ?? video.currentTime;
+        if (Math.abs(lastSeek - targetTime) > SEEK_EPSILON) {
           try {
             video.currentTime = targetTime;
+            segment.seekTime = targetTime;
+            busy = true;
           } catch {
             // Keep the last painted frame while the browser catches up.
           }
         }
       }
+
+      return busy;
     };
 
-    const tick = () => {
+    const tick = (now: number) => {
       if (destroyed) {
         return;
       }
+      const dt = lastTick ? Math.min(64, now - lastTick) : 16.7;
+      lastTick = now;
       if (dirty) {
         dirty = false;
+        settled = false;
         readScroll();
       }
-      updateVideos();
+      if (!settled) {
+        settled = !updateVideos(dt);
+      }
       frame = window.requestAnimationFrame(tick);
     };
 
@@ -569,13 +634,14 @@ export function ScrollScrub({
       window.removeEventListener("orientationchange", layout);
       window.removeEventListener("pointerdown", onFirstGesture);
       window.removeEventListener("touchstart", onFirstGesture);
-      root.style.removeProperty("--ss-progress");
+      stage.style.removeProperty("--ss-progress");
       delete root.dataset.activeSection;
 
       for (const segment of runtime) {
         unloadClip(segment);
         segment.layer.style.removeProperty("opacity");
         segment.layer.style.removeProperty("z-index");
+        delete segment.layer.dataset.visible;
       }
     };
   }, [segments]);

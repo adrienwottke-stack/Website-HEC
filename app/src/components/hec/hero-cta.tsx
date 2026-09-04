@@ -9,6 +9,10 @@ interface HeroCtaProps {
  * CTA garment 1: viewfinder brackets that close around the label on hover,
  * with a magnetic pull toward the pointer (pointer devices only, no springs
  * library needed: one RAF-driven lerp on the transform).
+ *
+ * The pointer handler never touches layout: the anchor's rect is measured at
+ * most once per animation frame (after scroll/resize) and the whole magnet
+ * sleeps while the hero is off screen.
  */
 export function HeroCta({ href, children }: HeroCtaProps) {
   const ref = useRef<HTMLAnchorElement>(null);
@@ -20,10 +24,13 @@ export function HeroCta({ href, children }: HeroCtaProps) {
       return;
     }
     let raf = 0;
+    let measureRaf = 0;
     let targetX = 0;
     let targetY = 0;
     let currentX = 0;
     let currentY = 0;
+    let inView = true;
+    let rect: DOMRect | null = null;
 
     const tick = () => {
       currentX += (targetX - currentX) * 0.18;
@@ -36,8 +43,22 @@ export function HeroCta({ href, children }: HeroCtaProps) {
       }
     };
 
+    const measure = () => {
+      measureRaf = 0;
+      rect = inView ? el.getBoundingClientRect() : null;
+    };
+    const scheduleMeasure = () => {
+      if (!measureRaf) measureRaf = window.requestAnimationFrame(measure);
+    };
+
+    const release = () => {
+      targetX = 0;
+      targetY = 0;
+      if (!raf) raf = window.requestAnimationFrame(tick);
+    };
+
     const onMove = (event: PointerEvent) => {
-      const rect = el.getBoundingClientRect();
+      if (!inView || !rect) return;
       const dx = event.clientX - (rect.left + rect.width / 2);
       const dy = event.clientY - (rect.top + rect.height / 2);
       const dist = Math.hypot(dx, dy);
@@ -53,10 +74,31 @@ export function HeroCta({ href, children }: HeroCtaProps) {
       if (!raf) raf = window.requestAnimationFrame(tick);
     };
 
+    const observer =
+      typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver((entries) => {
+            inView = entries.some((entry) => entry.isIntersecting);
+            if (inView) {
+              scheduleMeasure();
+            } else {
+              rect = null;
+              release();
+            }
+          })
+        : null;
+    observer?.observe(el);
+
+    scheduleMeasure();
     window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("scroll", scheduleMeasure, { passive: true });
+    window.addEventListener("resize", scheduleMeasure);
     return () => {
+      observer?.disconnect();
       window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("scroll", scheduleMeasure);
+      window.removeEventListener("resize", scheduleMeasure);
       if (raf) window.cancelAnimationFrame(raf);
+      if (measureRaf) window.cancelAnimationFrame(measureRaf);
       el.style.transform = "";
     };
   }, []);

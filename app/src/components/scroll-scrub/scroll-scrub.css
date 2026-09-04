@@ -35,6 +35,12 @@
   margin: 0;
   overflow: hidden;
   opacity: 0;
+  contain: strict;
+}
+
+/* Only the layers taking part in a crossfade get a compositor layer; five
+ * permanently promoted full-viewport textures cost GPU memory for nothing. */
+.scroll-scrub__layer[data-visible="true"] {
   will-change: opacity;
 }
 
@@ -130,6 +136,10 @@
 .scroll-scrub__chapter,
 .scroll-scrub__connector-band {
   position: relative;
+}
+
+.scroll-scrub__chapter {
+  contain: layout style;
 }
 
 .scroll-scrub__chapter-pin {
