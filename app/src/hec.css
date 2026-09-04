@@ -1104,10 +1104,6 @@ html[data-ignition="impact"] .hec-nav {
     display: none;
   }
 
-  .hec-hero-logo {
-    transform: none;
-  }
-
   .hec-nav,
   .hec-journey #ignition .scroll-scrub__copy,
   .hec-hero-logo img,
@@ -1139,8 +1135,14 @@ html[data-ignition="impact"] .hec-nav {
     font-size: clamp(2rem, 9.6vw, 2.7rem);
   }
 
+  /* phones: the copy is bottom-anchored, so the logo moves into the upper
+   * third and never sits under the title */
+  .hec-hero-logo {
+    transform: translateY(-22vh);
+  }
+
   .hec-hero-logo img {
-    width: min(72vw, 34rem);
+    width: min(72vw, 40vh, 34rem);
   }
 
   /* chapter route is desktop chrome; the progress bar stays */
