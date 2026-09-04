@@ -8,11 +8,13 @@ import "./scroll-scrub.css";
 export interface ScrollScrubScene {
   id: string;
   label: string;
-  /** Exact first frame of the deployed desktop clip. */
-  poster: string;
+  /** Exact first frame of the deployed desktop clip. Omit together with clip
+   * for a chapter with no film: the layer stays empty and the stage holds on
+   * the theme background. */
+  poster?: string;
   /** Exact first frame of mobileClip; provide whenever mobileClip is set. */
   mobilePoster?: string;
-  clip: string;
+  clip?: string;
   mobileClip?: string;
   title: string;
   body: string;
@@ -61,9 +63,9 @@ interface Segment {
   kind: "scene" | "connector";
   sectionIndex: number;
   nextSectionIndex: number;
-  poster: string;
+  poster?: string;
   mobilePoster?: string;
-  clip: string;
+  clip?: string;
   mobileClip?: string;
   weight: number;
   linger: number;
@@ -650,6 +652,11 @@ export function ScrollScrub({
     return null;
   }
 
+  // The chapter that opens the film is not necessarily the first segment: a
+  // chapter can carry no media at all (the hero holds on the background), and
+  // its poster must not be the one that loads eagerly.
+  const firstPoster = segments.findIndex((segment) => segment.poster);
+
   const themeStyle: ThemeStyle = {
     "--ss-accent": theme.accent,
     "--ss-bg": theme.background,
@@ -677,22 +684,24 @@ export function ScrollScrub({
                 key={segment.key}
                 style={layerStyle}
               >
-                <picture className="scroll-scrub__picture">
-                  {segment.mobilePoster ? (
-                    <source
-                      media="(hover: none) and (pointer: coarse), (max-width: 860px)"
-                      srcSet={segment.mobilePoster}
+                {segment.poster ? (
+                  <picture className="scroll-scrub__picture">
+                    {segment.mobilePoster ? (
+                      <source
+                        media="(hover: none) and (pointer: coarse), (max-width: 860px)"
+                        srcSet={segment.mobilePoster}
+                      />
+                    ) : null}
+                    <img
+                      alt=""
+                      className="scroll-scrub__poster"
+                      decoding="async"
+                      fetchPriority={index === firstPoster ? "high" : "auto"}
+                      loading={index === firstPoster ? "eager" : "lazy"}
+                      src={segment.poster}
                     />
-                  ) : null}
-                  <img
-                    alt=""
-                    className="scroll-scrub__poster"
-                    decoding="async"
-                    fetchPriority={index === 0 ? "high" : "auto"}
-                    loading={index === 0 ? "eager" : "lazy"}
-                    src={segment.poster}
-                  />
-                </picture>
+                  </picture>
+                ) : null}
               </figure>
             );
           })}

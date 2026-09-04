@@ -237,18 +237,19 @@ html[data-ignition="done"] .hec-veil {
   font-size: clamp(2.4rem, 5.4vw, 5.6rem);
 }
 
-/* logo layer inside the sticky stage. It never moves or scales: it burns
- * out between 3% and 12% of the hero chapter, while the film is still black,
- * so the film's ring and the logo's ring are never on screen together. */
+/* logo layer inside the sticky stage. It never moves or scales: it holds
+ * through the hero (which carries no film) and burns out between 50% and 85%
+ * of the chapter, so the stage is never empty: the logo is still fading while
+ * the meteor film crossfades in underneath it. */
 .hec-hero-logo {
-  --hec-hero-local: calc(var(--ss-progress, 0) / var(--hec-hero-share, 0.165));
+  --hec-hero-local: calc(var(--ss-progress, 0) / var(--hec-hero-share, 0.126));
   position: absolute;
   inset: 0;
   z-index: 3;
   display: grid;
   place-items: center;
   pointer-events: none;
-  opacity: clamp(0, (0.12 - var(--hec-hero-local)) / 0.09, 1);
+  opacity: clamp(0, (0.85 - var(--hec-hero-local)) / 0.35, 1);
   will-change: opacity;
 }
 
@@ -1139,6 +1140,10 @@ html[data-ignition="impact"] .hec-nav {
    * third and never sits under the title */
   .hec-hero-logo {
     transform: translateY(-22vh);
+    /* ...and it burns out earlier than on desktop (20% to 50% of the hero
+     * chapter): here the copy travels up through the logo, so the ring has to
+     * be gone before the CTA reaches it. */
+    opacity: clamp(0, (0.5 - var(--hec-hero-local)) / 0.3, 1);
   }
 
   .hec-hero-logo img {

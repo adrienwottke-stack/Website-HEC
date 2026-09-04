@@ -3,9 +3,12 @@
 # expects (one clip per scene), encode desktop + mobile variants, and extract
 # the exact first-frame posters from the ENCODED clips.
 #
-# Sources (refs/film/): source.mp4 = act 1 (ring), leg2.mp4 = meteor flight,
-# leg3.mp4 = atmosphere entry + impact. Each leg starts on the previous leg's
-# actual last frame, so the chapter cuts are cuts of one continuous take.
+# Sources (refs/film/): leg2.mp4 = meteor flight, leg3.mp4 = atmosphere entry +
+# impact. Each leg starts on the previous leg's actual last frame, so the chapter
+# cuts are cuts of one continuous take. Act 1 (refs/film/source.mp4, the ring)
+# is deliberately NOT cut any more: the journey opens on a static hero (logo +
+# copy over the ember field) and the film ignites straight into the meteor, so
+# the ring only ever exists as the logo and the load-time ignition canvas.
 # Every seek decodes from the previous keyframe, so both variants keep the GOP
 # at 4 frames (desktop was 8: seeks took up to 73 ms and varied wildly).
 # The meteor legs are far busier (sparks, explosions), so they get a 900p cap
@@ -23,9 +26,8 @@ command -v ffmpeg >/dev/null 2>&1 || { echo "ffmpeg missing" >&2; exit 127; }
 
 # chapter    source                 start  end    height crf-desktop crf-mobile
 SEGMENTS=(
-  "ignition   refs/film/source.mp4   0.00   6.75  1080 21 23"
-  "was-hec    refs/film/source.mp4   6.75  15.00  1080 21 23"
-  "stationen  refs/film/leg2.mp4     0.00  15.00   900 25 28"
+  "was-hec    refs/film/leg2.mp4     0.00   7.50   900 25 28"
+  "stationen  refs/film/leg2.mp4     7.50  15.00   900 25 28"
   "eintritt   refs/film/leg3.mp4     0.00   7.50   900 25 28"
   "einschlag  refs/film/leg3.mp4     7.50  15.00   900 25 28"
 )

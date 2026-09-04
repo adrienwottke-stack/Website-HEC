@@ -1,9 +1,11 @@
 /**
- * Scene data for the HEC journey: one seam-locked film chain (the ring, the
- * meteor flight past four stations, the atmosphere entry, the impact), cut
- * into five chapter segments. Every poster is the exact first frame of the
- * encoded clip beside it. Keep this array a module constant: changing its
- * identity rebuilds the media controller.
+ * Scene data for the HEC journey. The first chapter carries no film at all:
+ * the page opens on the black stage with the logo and the ember field, the
+ * copy scrolls, and only then does the film ignite. From there one seam-locked
+ * chain (the meteor flight past four stations, the atmosphere entry, the
+ * impact) runs across the remaining four chapters. Every poster is the exact
+ * first frame of the encoded clip beside it. Keep this array a module
+ * constant: changing its identity rebuilds the media controller.
  */
 import type {
   ScrollScrubScene,
@@ -36,15 +38,17 @@ const world = (name: string) => ({
 
 export const scrollScrubScenes: HecScene[] = [
   {
-    ...world("ignition"),
+    // No clip and no poster on purpose: the hero holds on the theme background
+    // so the ring never plays twice (the load-time ignition canvas and the
+    // logo already are the ring). The film starts with the meteor next door.
     id: "ignition",
     label: "Start",
     title: "Der Kreis für Leute, die was vorhaben.",
     body: "HEC ist eine Community in Dresden. Vier feste Termine pro Woche: Ziele, Sport, Autos, Nächte. Rein oder raus.",
     actions: <HeroCta href={WHATSAPP_URL}>{CTA_LABEL}</HeroCta>,
     align: "left",
-    scroll: 1.5,
-    scrim: 0.55,
+    scroll: 1.1,
+    scrim: 0,
   },
   {
     ...world("was-hec"),
