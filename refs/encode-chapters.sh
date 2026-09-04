@@ -6,6 +6,8 @@
 # Sources (refs/film/): source.mp4 = act 1 (ring), leg2.mp4 = meteor flight,
 # leg3.mp4 = atmosphere entry + impact. Each leg starts on the previous leg's
 # actual last frame, so the chapter cuts are cuts of one continuous take.
+# Every seek decodes from the previous keyframe, so both variants keep the GOP
+# at 4 frames (desktop was 8: seeks took up to 73 ms and varied wildly).
 # The meteor legs are far busier (sparks, explosions), so they get a 900p cap
 # and a higher CRF to stay inside the byte budget (desktop <= 32 MiB, mobile
 # <= 16 MiB for the whole chain).
@@ -39,7 +41,7 @@ for line in "${SEGMENTS[@]}"; do
   ffmpeg -v error -y -ss "$start" -to "$end" -i "$src" -an \
     -vf "scale=-2:'min($height,ih)',unsharp=5:5:0.8:5:5:0.0" \
     -c:v libx264 -preset slow -crf "$crfd" -pix_fmt yuv420p \
-    -g 8 -keyint_min 8 -sc_threshold 0 -movflags +faststart "$OUT/$name.mp4"
+    -g 4 -keyint_min 4 -sc_threshold 0 -movflags +faststart "$OUT/$name.mp4"
   ffmpeg -v error -y -ss "$start" -to "$end" -i "$src" -an \
     -vf "scale=-2:'min(720,ih)',unsharp=5:5:0.6:5:5:0.0" \
     -c:v libx264 -preset slow -crf "$crfm" -pix_fmt yuv420p \
