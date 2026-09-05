@@ -79,6 +79,10 @@ interface RuntimeSegment extends Segment {
   layer: HTMLElement;
   start: number;
   end: number;
+  /** Scroll distance this segment scrubs its clip over. Same as end - start
+   * for every band the sticky stage stays pinned through, one viewport
+   * shorter for the last one -- see layout(). */
+  scrub: number;
   current: number;
   target: number;
   visible: boolean;
@@ -240,6 +244,7 @@ export function ScrollScrub({
       layer: layerNodes[index],
       loading: false,
       ready: false,
+      scrub: 1,
       start: 0,
       target: 0,
       visible: index === 0,
@@ -288,7 +293,7 @@ export function ScrollScrub({
       viewportHeight = window.innerHeight;
       layoutWidth = window.innerWidth;
 
-      for (const segment of runtime) {
+      for (const [index, segment] of runtime.entries()) {
         if (
           segment.loadedSource &&
           segment.loadedSource !== sourceFor(segment)
@@ -298,6 +303,17 @@ export function ScrollScrub({
         const rect = segment.band.getBoundingClientRect();
         segment.start = rect.top + pageY - rootTop;
         segment.end = segment.start + rect.height;
+        // One sticky stage covers the whole section, so it unsticks a viewport
+        // before the last band ends: that last viewport-height slides the film
+        // off screen instead of scrubbing it. Scrubbing the final segment over
+        // its full height therefore left the tail of its clip unreachable --
+        // the closing chapter could never play its last frame. Every earlier
+        // band is pinned end to end, so its scrub length is its height.
+        const last = index === runtime.length - 1;
+        segment.scrub = Math.max(
+          last ? rect.height - viewportHeight : rect.height,
+          1
+        );
       }
       total = Math.max(runtime.at(-1)?.end ?? viewportHeight, viewportHeight);
       dirty = true;
@@ -440,8 +456,7 @@ export function ScrollScrub({
           currentIndex = index;
         }
 
-        const length = Math.max(segment.end - segment.start, 1);
-        const local = clamp((y - segment.start) / length);
+        const local = clamp((y - segment.start) / segment.scrub);
         segment.target = segment.linger
           ? lingerEase(local, segment.linger)
           : local;

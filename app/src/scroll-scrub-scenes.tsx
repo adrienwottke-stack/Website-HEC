@@ -34,7 +34,7 @@ export const scrollScrubTheme: ScrollScrubTheme = {
  * re-encode; it is the only thing that makes a recut reach people who have
  * already been on the page.
  */
-const WORLD_VERSION = "2";
+const WORLD_VERSION = "3";
 
 const asset = (path: string) => `${path}?v=${WORLD_VERSION}`;
 
@@ -104,6 +104,16 @@ export const scrollScrubScenes: HecScene[] = [
     scrim: 1,
   },
   {
+    // The finale, and the only chapter whose clip does not run at speed: the
+    // impact beat is time-warped into slow motion and the burnt-out ring bed
+    // behind it is compressed (see the impact ramp in refs/encode-chapters.sh).
+    // The retime is what makes the hit land; this scroll length only buys it
+    // room. Change one and re-check the other.
+    //
+    // The last chapter also pays a viewport: the sticky stage unsticks before
+    // the band ends, so the engine scrubs this clip over scroll - 1 viewports
+    // and the last one slides the finished frame away. 3.4 leaves ~2160 px of
+    // scrub, ~1640 of which are the hit itself.
     ...world("einschlag"),
     id: "rein",
     label: "Rein",
@@ -111,7 +121,7 @@ export const scrollScrubScenes: HecScene[] = [
     body: "Ein Klick, dann bist du in der Gruppe. Der nächste Termin steht drin.",
     actions: <ImpactCta href={WHATSAPP_URL}>{CTA_LABEL}</ImpactCta>,
     align: "left",
-    scroll: 2.0,
+    scroll: 3.4,
     scrim: 0.85,
   },
 ];
