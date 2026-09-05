@@ -139,6 +139,128 @@ html[data-ignition="done"] .hec-veil {
   pointer-events: none;
 }
 
+/* ---------- ignition punch cards ---------- */
+
+/* Reel grammar over the flying meteor: two lines cut in, the impact takes them
+ * away. Everything hangs off html[data-ignition="armed"], so the layer is inert
+ * markup for repeat visitors, for reduced-motion users, and from the frame the
+ * gate flips the attribute to "impact"/"done" (which is also what a skip does).
+ * Sits above the canvas (z 60) so the meteor flies BEHIND the text. */
+.hec-punch {
+  /* Timeline scale: the intro engine runs at 0.8x on mobile
+   * (ignition-engine.ts), so every delay below is a multiple of this and the
+   * cards stay locked to the impact on both. */
+  --hec-punch-t: 1;
+  position: fixed;
+  inset: 0;
+  z-index: 61;
+  display: none;
+  pointer-events: none;
+}
+
+html[data-ignition="armed"] .hec-punch {
+  display: block;
+}
+
+/* The cards sit in the upper third, where the meteor is not yet: it enters top
+ * left and grows into the centre. The scrim only insures the last beat, when
+ * the fireball is big enough to reach up. */
+.hec-punch__stack {
+  position: absolute;
+  inset: max(18vh, 7rem) var(--hec-gutter) auto;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.hec-punch__scrim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    62% 42% at 50% 26%,
+    rgba(7, 6, 6, 0.72) 0%,
+    rgba(7, 6, 6, 0.45) 45%,
+    transparent 78%
+  );
+  opacity: 0;
+  animation: hec-punch-scrim calc(1700ms * var(--hec-punch-t)) linear both;
+}
+
+.hec-punch__line {
+  grid-area: 1 / 1;
+  margin: 0;
+  max-width: 16ch;
+  font-family: var(--hec-display);
+  font-size: clamp(1.75rem, 4.4vw, 3.4rem);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--hec-ink);
+  text-wrap: balance;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+/* Hard cuts, no cross-fade: each card owns its beat and is gone before the
+ * next one lands, the way the reel cuts. Card 2 runs into the impact (1.6 s),
+ * where the attribute change removes the whole layer mid-animation. */
+.hec-punch__line:nth-child(1) {
+  animation: hec-punch-cut calc(760ms * var(--hec-punch-t)) var(--hec-ease-out)
+    calc(180ms * var(--hec-punch-t)) both;
+}
+
+.hec-punch__line:nth-child(2) {
+  color: var(--hec-core);
+  animation: hec-punch-cut calc(760ms * var(--hec-punch-t)) var(--hec-ease-out)
+    calc(940ms * var(--hec-punch-t)) both;
+}
+
+@keyframes hec-punch-cut {
+  0% {
+    opacity: 0;
+    transform: translateY(14px) scale(1.05);
+  }
+  9% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  84% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.99);
+  }
+}
+
+@keyframes hec-punch-scrim {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 860px), (pointer: coarse) {
+  .hec-punch {
+    --hec-punch-t: 0.8;
+  }
+
+  .hec-punch__stack {
+    inset: max(16vh, 5.5rem) 1.25rem auto;
+  }
+}
+
 /* ---------- journey (scroll-scrub) overrides ---------- */
 
 .hec-journey .scroll-scrub__stage {
@@ -235,33 +357,6 @@ html[data-ignition="done"] .hec-veil {
 .hec-journey #ignition .scroll-scrub__title {
   max-width: 18ch;
   font-size: clamp(2.4rem, 5.4vw, 5.6rem);
-}
-
-/* logo layer inside the sticky stage. It never moves or scales: it holds
- * through the hero (which carries no film) and burns out between 50% and 85%
- * of the chapter, so the stage is never empty: the logo is still fading while
- * the meteor film crossfades in underneath it. */
-.hec-hero-logo {
-  --hec-hero-local: calc(var(--ss-progress, 0) / var(--hec-hero-share, 0.126));
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-  opacity: clamp(0, (0.85 - var(--hec-hero-local)) / 0.35, 1);
-  will-change: opacity;
-}
-
-.hec-hero-logo img {
-  width: min(64vw, 34rem);
-  height: auto;
-  /* hec-logo-cut.* carries real alpha (black keyed out), so no blend mode is
-   * needed; screen blending inside the faded layer showed the PNG square. */
-}
-
-html[data-ignition="impact"] .hec-hero-logo img {
-  animation: hec-logo-slam 760ms var(--hec-ease-out) both;
 }
 
 .hec-embers {
@@ -474,13 +569,20 @@ html[data-ignition="impact"] .hec-nav {
   letter-spacing: 0.06em;
 }
 
-.hec-viewfinder__dot {
-  width: 8px;
-  height: 8px;
-  margin-right: 0.85rem;
-  background: var(--hec-accent);
-  box-shadow: 0 0 10px rgba(255, 46, 20, 0.9);
+/* The brand ring, quoted small, is what stands inside the viewfinder: the one
+ * place the logo belongs on the join CTA. Keeps the REC pulse of the dot it
+ * replaced, so the sucher metaphor survives. */
+.hec-viewfinder__mark {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.7rem;
+  color: var(--hec-accent);
+  filter: drop-shadow(0 0 8px rgba(255, 46, 20, 0.75));
   animation: hec-rec 1.6s ease-in-out infinite;
+}
+
+.hec-viewfinder:hover .hec-viewfinder__mark {
+  color: var(--hec-heat-2);
 }
 
 .hec-viewfinder:active {
@@ -754,7 +856,9 @@ html[data-ignition="impact"] .hec-nav {
   height: 100%;
   object-fit: cover;
   opacity: 0.85;
-  transition: transform 700ms var(--hec-ease-out), opacity 400ms;
+  transition:
+    transform 700ms var(--hec-ease-out),
+    opacity 400ms;
 }
 
 .hec-reel__facade:hover .hec-reel__poster {
@@ -773,7 +877,9 @@ html[data-ignition="impact"] .hec-nav {
   box-shadow:
     0 0 26px rgba(255, 46, 20, 0.45),
     inset 0 0 18px rgba(255, 46, 20, 0.25);
-  transition: transform 340ms var(--hec-ease-out), box-shadow 340ms;
+  transition:
+    transform 340ms var(--hec-ease-out),
+    box-shadow 340ms;
 }
 
 .hec-reel__facade:hover .hec-reel__ring {
@@ -1049,21 +1155,6 @@ html[data-ignition="impact"] .hec-nav {
   }
 }
 
-@keyframes hec-logo-slam {
-  0% {
-    transform: scale(1.7);
-    filter: brightness(3) blur(8px);
-  }
-  55% {
-    transform: scale(0.96);
-    filter: brightness(1.4) blur(0);
-  }
-  100% {
-    transform: scale(1);
-    filter: brightness(1) blur(0);
-  }
-}
-
 @keyframes hec-copy-slam {
   0% {
     opacity: 0;
@@ -1107,8 +1198,7 @@ html[data-ignition="impact"] .hec-nav {
 
   .hec-nav,
   .hec-journey #ignition .scroll-scrub__copy,
-  .hec-hero-logo img,
-  .hec-viewfinder__dot {
+  .hec-viewfinder__mark {
     animation: none !important;
   }
 
@@ -1134,20 +1224,6 @@ html[data-ignition="impact"] .hec-nav {
 @media (max-width: 860px) {
   .hec-journey #ignition .scroll-scrub__title {
     font-size: clamp(2rem, 9.6vw, 2.7rem);
-  }
-
-  /* phones: the copy is bottom-anchored, so the logo moves into the upper
-   * third and never sits under the title */
-  .hec-hero-logo {
-    transform: translateY(-22vh);
-    /* ...and it burns out earlier than on desktop (20% to 50% of the hero
-     * chapter): here the copy travels up through the logo, so the ring has to
-     * be gone before the CTA reaches it. */
-    opacity: clamp(0, (0.5 - var(--hec-hero-local)) / 0.3, 1);
-  }
-
-  .hec-hero-logo img {
-    width: min(72vw, 40vh, 34rem);
   }
 
   /* chapter route is desktop chrome; the progress bar stays */
@@ -1247,17 +1323,6 @@ html[data-ignition="impact"] .hec-nav {
   align-items: center;
 }
 
-/* hero composition: on wide screens the logo sits up and right of the copy */
-@media (min-width: 861px) {
-  .hec-hero-logo {
-    transform: translate(9vw, -9vh);
-  }
-
-  .hec-hero-logo img {
-    width: min(48vw, 36rem);
-  }
-}
-
 /* ---------- impact chapter: CTA plate + page-level impact cue ---------- */
 
 .hec-impact {
@@ -1277,7 +1342,9 @@ html[data-ignition="impact"] .hec-nav {
   text-transform: uppercase;
   text-decoration: none;
   isolation: isolate;
-  transition: transform 480ms var(--hec-ease-out), border-color 300ms;
+  transition:
+    transform 480ms var(--hec-ease-out),
+    border-color 300ms;
 }
 
 .hec-impact__plate {
@@ -1288,7 +1355,10 @@ html[data-ignition="impact"] .hec-nav {
   background-size: cover;
   background-repeat: no-repeat;
   opacity: 0.85;
-  transition: transform 800ms var(--hec-ease-out), opacity 400ms, filter 400ms;
+  transition:
+    transform 800ms var(--hec-ease-out),
+    opacity 400ms,
+    filter 400ms;
 }
 
 .hec-impact__label {
@@ -1459,9 +1529,8 @@ html[data-ignition="impact"] .hec-nav {
     0 6px 40px rgba(0, 0, 0, 0.65);
 }
 
-/* Hero-only layers: the logo has faded out before chapter 0 ends, and the
- * ember loop pauses itself (IntersectionObserver) once its canvas is hidden. */
-.hec-journey[data-active-section]:not([data-active-section="0"]) .hec-hero-logo,
+/* Hero-only layer: the ember loop pauses itself (IntersectionObserver) once
+ * its canvas is hidden. */
 .hec-journey[data-active-section]:not([data-active-section="0"]) .hec-embers {
   display: none;
 }
@@ -1475,7 +1544,6 @@ html[data-ignition="impact"] .hec-nav {
   .hec-scrim__bottom {
     opacity: 1;
   }
-
 }
 
 /* ---------- mobile: everything over the film must fit one screen ---------- */

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { HeroPunch } from "@/components/hec/hero-punch";
 import { IgnitionGate } from "@/components/hec/ignition/ignition-gate";
 import { Journey } from "@/components/hec/journey";
 import { ReelsStrip } from "@/components/hec/reels-strip";
@@ -46,10 +47,15 @@ export const Route = createFileRoute("/")({
 // every chapter stays server-rendered in semantic flow. The ignition intro is
 // a load-time canvas overlay that never touches the video elements; the
 // meteor's impact is the final chapter, where the join CTA lives.
+//
+// Two load-time layers ride above the hero and neither touches the scrub:
+// the canvas intro (client-only, through the gate) and the punch cards
+// (server-rendered, pure CSS, keyed on the same data-ignition attribute).
 function Index() {
   return (
     <>
       <IgnitionGate />
+      <HeroPunch />
       <SiteNav />
       <main>
         <StructuredData json={SCHEMA} />

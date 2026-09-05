@@ -6,10 +6,7 @@
 /** Public origin of the site (canonical, og:url, JSON-LD). Set VITE_SITE_URL in
  * the hosting environment (Vercel: Project Settings > Environment Variables). */
 const SITE_URL_ENV = (import.meta.env.VITE_SITE_URL as string | undefined)?.trim();
-export const SITE_URL = (SITE_URL_ENV || "https://website-hec.vercel.app").replace(
-  /\/+$/,
-  "",
-);
+export const SITE_URL = (SITE_URL_ENV || "https://website-hec.vercel.app").replace(/\/+$/, "");
 export const SITE_NAME = "HEC";
 export const SITE_TITLE = "HEC. High Energy Circle Dresden";
 export const SITE_DESCRIPTION =
@@ -101,3 +98,12 @@ export const LEGAL = {
   email: "a.wottke@nexara-ai.de",
   phone: "+49 160 3233104",
 };
+
+/**
+ * The load-time punch cards: short lines that cut in over the flying meteor,
+ * before the impact plants the headline. Reel grammar, HEC words. Only ever
+ * seen on a first visit with motion allowed (see hero-punch.tsx); the real
+ * message lives in the H1 underneath, so these stay out of the a11y tree.
+ * Two lines max, each short enough to read in one beat.
+ */
+export const HERO_PUNCH = ["Du redest seit Monaten davon.", "Was, wenn du's machst?"];

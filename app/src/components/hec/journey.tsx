@@ -13,16 +13,8 @@ type WrapStyle = CSSProperties & Record<`--hec-${string}`, string | number>;
 
 const firstScene = scrollScrubScenes[0];
 
-/** The hero chapter's share of the whole journey (its scroll weight over the
- * sum of all weights). hec.css turns the engine's global --ss-progress into
- * hero-local progress with it, so the logo burn-out is timed to the chapter
- * no matter how the other chapters are weighted. */
-const totalWeight = scrollScrubScenes.reduce((sum, scene) => sum + (scene.scroll ?? 1.4), 0);
-const heroShare = (firstScene.scroll ?? 1.4) / totalWeight;
-
 const initialStyle: WrapStyle = {
   "--hec-scrim": firstScene.scrim,
-  "--hec-hero-share": heroShare.toFixed(4),
 };
 
 /**

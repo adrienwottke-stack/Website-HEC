@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 
+import { RingMark } from "./ring-mark";
+
 interface HeroCtaProps {
   href: string;
   children: string;
@@ -109,7 +111,7 @@ export function HeroCta({ href, children }: HeroCtaProps) {
       <span className="hec-viewfinder__corner hec-viewfinder__corner--tr" aria-hidden="true" />
       <span className="hec-viewfinder__corner hec-viewfinder__corner--bl" aria-hidden="true" />
       <span className="hec-viewfinder__corner hec-viewfinder__corner--br" aria-hidden="true" />
-      <span className="hec-viewfinder__dot" aria-hidden="true" />
+      <RingMark className="hec-viewfinder__mark" />
       <span className="hec-viewfinder__label">{children}</span>
     </a>
   );
