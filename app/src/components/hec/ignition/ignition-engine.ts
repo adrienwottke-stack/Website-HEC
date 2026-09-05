@@ -96,11 +96,16 @@ export function runIgnition(
   window.addEventListener("resize", resize);
 
   const speed = mobile ? 0.8 : 1;
+  // Stretched so the two punch cards (hero-punch.tsx) are actually readable
+  // before the hit: the comet still enters at its old pace, but the fireball
+  // now takes ~1.9 s to reach the centre instead of 0.7 s, which reads as held
+  // tension rather than sluggishness. Every CSS safety delay keyed on
+  // data-ignition="armed" in hec.css tracks these numbers.
   const T = {
-    enterEnd: 900 * speed,
-    impact: 1600 * speed,
-    settleEnd: 2350 * speed,
-    fadeEnd: 2650 * speed,
+    enterEnd: 1400 * speed,
+    impact: 3300 * speed,
+    settleEnd: 4050 * speed,
+    fadeEnd: 4350 * speed,
   };
   const sprites = SPRITE_STOPS.map(([a, b]) => makeSprite(a, b));
   const particles: Particle[] = [];

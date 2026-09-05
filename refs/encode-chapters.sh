@@ -26,8 +26,8 @@ command -v ffmpeg >/dev/null 2>&1 || { echo "ffmpeg missing" >&2; exit 127; }
 
 # chapter    source                 start  end    height crf-desktop crf-mobile
 SEGMENTS=(
-  "was-hec    refs/film/leg2.mp4     0.00   7.50   900 25 28"
-  "stationen  refs/film/leg2.mp4     7.50  15.00   900 25 28"
+  "was-hec    refs/film/leg2.mp4     1.00   8.00   900 25 28"
+  "stationen  refs/film/leg2.mp4     8.00  15.00   900 25 28"
   "eintritt   refs/film/leg3.mp4     0.00   7.50   900 25 28"
   "einschlag  refs/film/leg3.mp4     7.50  15.00   900 25 28"
 )
