@@ -35,6 +35,8 @@ function ImpressumPage() {
           </address>
           <h2>Kontakt</h2>
           <p>
+            Telefon: <a href={`tel:${LEGAL.phone.replace(/\s+/g, "")}`}>{LEGAL.phone}</a>
+            <br />
             E-Mail: <a href={`mailto:${LEGAL.email}`}>{LEGAL.email}</a>
           </p>
           <h2>Verantwortlich für den Inhalt</h2>

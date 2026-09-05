@@ -93,10 +93,11 @@ export interface Reel {
 /** Reels from the meetups. Empty array hides the section entirely. */
 export const REELS: Reel[] = [];
 
-/** Legal data for /impressum and /datenschutz. INPUT_PENDING until provided. */
+/** Legal data for /impressum and /datenschutz. */
 export const LEGAL = {
-  name: "INPUT_PENDING",
-  street: "INPUT_PENDING",
-  city: "INPUT_PENDING",
-  email: "INPUT_PENDING",
+  name: "Adrien Wottke",
+  street: "Bamberger Straße 11",
+  city: "01187 Dresden",
+  email: "a.wottke@nexara-ai.de",
+  phone: "+49 160 3233104",
 };
