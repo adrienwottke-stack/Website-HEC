@@ -15,6 +15,10 @@
 # and a higher CRF to stay inside the byte budget (desktop <= 32 MiB, mobile
 # <= 16 MiB for the whole chain).
 #
+# AFTER RE-ENCODING: bump WORLD_VERSION in app/src/scroll-scrub-scenes.tsx.
+# These files keep their names, so without that bump browsers and the CDN go on
+# serving the previous cut to anyone who has loaded the page before.
+#
 # Usage: bash refs/encode-chapters.sh [chapter ...]   (no args = all)
 # Output: app/public/assets/world/<chapter>{,-mobile}.mp4 + *-poster.jpg
 

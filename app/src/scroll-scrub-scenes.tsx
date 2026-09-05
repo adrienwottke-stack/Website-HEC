@@ -26,11 +26,23 @@ export const scrollScrubTheme: ScrollScrubTheme = {
   muted: "#9a8f88",
 };
 
+/**
+ * Cache key for everything under /assets/world/. These files live in public/,
+ * so the build never hashes their names: re-encoding a chapter leaves the URL
+ * identical and browsers (and the CDN) keep serving the old footage — which is
+ * exactly how a cut ring act survived its own removal. Bump this on every
+ * re-encode; it is the only thing that makes a recut reach people who have
+ * already been on the page.
+ */
+const WORLD_VERSION = "2";
+
+const asset = (path: string) => `${path}?v=${WORLD_VERSION}`;
+
 const world = (name: string) => ({
-  clip: `/assets/world/${name}.mp4`,
-  mobileClip: `/assets/world/${name}-mobile.mp4`,
-  mobilePoster: `/assets/world/${name}-mobile-poster.jpg`,
-  poster: `/assets/world/${name}-poster.jpg`,
+  clip: asset(`/assets/world/${name}.mp4`),
+  mobileClip: asset(`/assets/world/${name}-mobile.mp4`),
+  mobilePoster: asset(`/assets/world/${name}-mobile-poster.jpg`),
+  poster: asset(`/assets/world/${name}-poster.jpg`),
 });
 
 export const scrollScrubScenes: HecScene[] = [
@@ -41,8 +53,8 @@ export const scrollScrubScenes: HecScene[] = [
     // the ring never plays twice — the film starts with the meteor next door.
     id: "ignition",
     label: "Start",
-    poster: "/assets/world/hero-poster.jpg",
-    mobilePoster: "/assets/world/hero-mobile-poster.jpg",
+    poster: asset("/assets/world/hero-poster.jpg"),
+    mobilePoster: asset("/assets/world/hero-mobile-poster.jpg"),
     title: "Der Kreis für Leute, die was vorhaben.",
     body: "HEC ist eine Community in Dresden. Vier feste Termine pro Woche: Ziele, Sport, Autos, Nächte. Rein oder raus.",
     actions: <HeroCta href={WHATSAPP_URL}>{CTA_LABEL}</HeroCta>,
